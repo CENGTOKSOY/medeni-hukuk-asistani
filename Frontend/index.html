@@ -1,0 +1,631 @@
+ <!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MehuGPT - Medeni Hukuk Asistanı</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-darker: #0a0a0a;
+            --bg-panel: #1e1e1e;
+            --primary-text: #e0e0e0;
+            --secondary-text: #a0a0a0;
+            --accent-color: #3a3a3a;
+            --input-bg: #2d2d2d;
+            --border-color: #333;
+            --user-message: #553d2f;
+            --bot-message: #2d2d2d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--primary-text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sol Panel */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-darker);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .new-chat-btn {
+            background-color: var(--accent-color);
+            color: var(--primary-text);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .new-chat-btn i {
+            margin-right: 5px;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .search-bar {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--primary-text);
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .chat-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 3px solid transparent;
+        }
+
+        .chat-item-content {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .chat-item:hover {
+            background-color: var(--bg-panel);
+        }
+
+        .chat-item.active {
+            background-color: var(--accent-color);
+            border-left: 3px solid var(--primary-text);
+        }
+
+        .chat-item i {
+            margin-right: 10px;
+            color: var(--secondary-text);
+        }
+
+        .delete-chat {
+            color: var(--secondary-text);
+            padding: 5px;
+            display: none;
+        }
+
+        .chat-item:hover .delete-chat {
+            display: block;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--bg-panel);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .dropdown-content a {
+            color: var(--primary-text);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--accent-color);
+        }
+
+        .profile-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Ana İçerik */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .top-bar {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .toggle-sidebar-main {
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .profile i {
+            margin-left: 8px;
+            color: var(--secondary-text);
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .welcome-container {
+            margin: auto;
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 600px;
+        }
+
+        .chat-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-text);
+        }
+
+        .welcome-message {
+            background-color: var(--input-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .message-container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .message {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            line-height: 1.6;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background-color: var(--user-message);
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot-message {
+            background-color: var(--bot-message);
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: var(--secondary-text);
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .input-area {
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-darker);
+        }
+
+        .input-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--primary-text);
+            font-size: 1rem;
+            outline: none;
+            resize: none;
+            min-height: 60px;
+            max-height: 200px;
+        }
+
+        .input-actions {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-actions button {
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 100;
+                height: 100%;
+            }
+
+            .chat-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sol Panel -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" id="new-chat-btn">
+                <i class="fas fa-plus"></i>
+                <span>Yeni Sohbet</span>
+            </button>
+            <button class="toggle-sidebar" id="toggle-sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Sohbet ara...">
+        </div>
+
+        <div class="chat-history" id="chat-history">
+            <!-- Sohbet geçmişi buraya dinamik olarak eklenecek -->
+        </div>
+    </div>
+
+    <!-- Ana İçerik -->
+    <div class="main-content">
+        <div class="top-bar">
+            <div>
+                <button class="toggle-sidebar-main" id="toggle-sidebar-main">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="profile-dropdown">
+                <div class="profile">
+                    <span>My Profile</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a href="#"><i class="fas fa-user"></i> Profil</a>
+                    <a href="#"><i class="fas fa-cog"></i> Ayarlar</a>
+                    <a href="#"><i class="fas fa-sign-out-alt"></i> Oturumu Kapat</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chat-container">
+            <div class="welcome-container" id="welcome-container">
+                <h1 class="chat-title">Medeni Hukuk Asistanı</h1>
+                <div class="welcome-message">
+                    Merhaba, Medeni Hukuk ile ilgili sorunuzu bana sorabilirsiniz.
+                </div>
+            </div>
+
+            <div class="message-container" id="message-container">
+                <!-- Mesajlar buraya eklenecek -->
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-container">
+                <textarea class="input-box" id="user-input" placeholder="Mesaj yazın..." rows="1"></textarea>
+                <div class="input-actions">
+                    <button id="voice-btn">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elementleri
+            const sidebar = document.querySelector('.sidebar');
+            const toggleSidebar = document.getElementById('toggle-sidebar');
+            const toggleSidebarMain = document.getElementById('toggle-sidebar-main');
+            const newChatBtn = document.getElementById('new-chat-btn');
+            const chatHistory = document.getElementById('chat-history');
+            const welcomeContainer = document.getElementById('welcome-container');
+            const messageContainer = document.getElementById('message-container');
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            const voiceBtn = document.getElementById('voice-btn');
+
+            // Sohbet geçmişi ve aktif sohbet
+            let chats = [];
+            let activeChatId = null;
+
+            // Panel aç/kapa
+            function toggleSidebarFunc() {
+                sidebar.classList.toggle('collapsed');
+            }
+
+            toggleSidebar.addEventListener('click', toggleSidebarFunc);
+            toggleSidebarMain.addEventListener('click', toggleSidebarFunc);
+
+            // Yeni sohbet oluştur
+            function createNewChat() {
+                const chatId = Date.now().toString();
+                const chatTitle = "Yeni Sohbet " + (chats.length + 1);
+                const chat = {
+                    id: chatId,
+                    title: chatTitle,
+                    messages: [],
+                    createdAt: new Date()
+                };
+
+                chats.unshift(chat); // En üste ekle
+                activeChatId = chatId;
+                renderChatHistory();
+                switchToChat(chatId);
+
+                // Hoş geldin mesajını gizle ve mesaj alanını göster
+                welcomeContainer.style.display = 'none';
+                messageContainer.style.display = 'block';
+            }
+
+            newChatBtn.addEventListener('click', createNewChat);
+
+            // Sohbet geçmişini render et
+            function renderChatHistory() {
+                chatHistory.innerHTML = '';
+
+                chats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = `chat-item ${activeChatId === chat.id ? 'active' : ''}`;
+                    chatItem.innerHTML = `
+                        <div class="chat-item-content">
+                            <i class="fas fa-comment-alt"></i>
+                            <span>${chat.title}</span>
+                        </div>
+                        <div class="delete-chat" data-chat-id="${chat.id}">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                    `;
+
+                    chatItem.addEventListener('click', (e) => {
+                        // Silme butonuna tıklanmadıysa
+                        if (!e.target.closest('.delete-chat')) {
+                            switchToChat(chat.id);
+                        }
+                    });
+
+                    // Sohbet silme butonu
+                    const deleteBtn = chatItem.querySelector('.delete-chat');
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteChat(chat.id);
+                    });
+
+                    chatHistory.appendChild(chatItem);
+                });
+            }
+
+            // Sohbet silme fonksiyonu
+            function deleteChat(chatId) {
+                if (confirm('Bu sohbeti silmek istediğinize emin misiniz?')) {
+                    chats = chats.filter(chat => chat.id !== chatId);
+
+                    // Eğer silinen sohbet aktif sohbetse
+                    if (activeChatId === chatId) {
+                        if (chats.length > 0) {
+                            activeChatId = chats[0].id;
+                            switchToChat(activeChatId);
+                        } else {
+                            createNewChat();
+                        }
+                    }
+
+                    renderChatHistory();
+                }
+            }
+
+            // Sohbeti değiştir
+            function switchToChat(chatId) {
+                activeChatId = chatId;
+                const chat = chats.find(c => c.id === chatId);
+
+                // Sohbet geçmişini güncelle
+                renderChatHistory();
+
+                // Mesajları yükle
+                messageContainer.innerHTML = '';
+
+                if (chat.messages.length > 0) {
+                    welcomeContainer.style.display = 'none';
+                    messageContainer.style.display = 'block';
+
+                    chat.messages.forEach(msg => {
+                        addMessageToContainer(msg.content, msg.isUser, false);
+                    });
+                } else {
+                    welcomeContainer.style.display = 'flex';
+                    messageContainer.style.display = 'none';
+                }
+
+                // En aşağı kaydır
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            // Mesaj ekle (hem arayüze hem de veriye)
+            function addMessage(content, isUser) {
+                if (!activeChatId) {
+                    createNewChat();
+                }
+
+                const chat = chats.find(c => c.id === activeChatId);
+                const message = {
+                    content,
+                    isUser,
+                    timestamp: new Date()
+                };
+
+                chat.messages.push(message);
+                chat.title = content.length > 30 ? content.substring(0, 30) + '...' : content;
+
+                addMessageToContainer(content, isUser, true);
+                renderChatHistory();
+            }
+
+            // Mesajı arayüze ekle
+            function addMessageToContainer(content, isUser, scroll) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                messageDiv.innerHTML = `
+                    <div class="message-content">${content}</div>
+                    <div class="message-time">${time}</div>
+                `;
+
+                messageContainer.appendChild(messageDiv);
+
+                if (scroll) {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            }
+
+            // Bot yanıtı simüle et
+            function simulateBotResponse(userMessage) {
+                const responses = [
+                    "Medeni Kanun'un 23. maddesine göre, bu durumda...",
+                    "Yargıtay'ın 2023/4567 sayılı kararında benzer bir durumda...",
+                    "Sorduğunuz konu Türk Medeni Kanunu'nun 145-156. maddeleri kapsamında düzenlenmiştir.",
+                    "Bu konuda Yargıtay'ın yerleşik bir içtihadı bulunmaktadır...",
+                    "Medeni hukukta bu durum '${userMessage.split(' ')[0]}' kavramıyla ilişkilendirilir..."
+                ];
+
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+                setTimeout(() => {
+                    addMessage(randomResponse, false);
+                }, 1000);
+            }
+
+            // Mesaj gönder
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (message === '') return;
+
+                addMessage(message, true);
+                userInput.value = '';
+
+                // Bot yanıtı simüle et (gerçek uygulamada API çağrısı yapılacak)
+                simulateBotResponse(message);
+            }
+
+            // Input event listeners
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            sendBtn.addEventListener('click', sendMessage);
+
+            // Sesli giriş butonu
+            voiceBtn.addEventListener('click', function() {
+                alert('Sesli giriş özelliği aktif edilecek');
+            });
+
+            // Textarea otomatik yüksekliği
+            userInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+
+            // Başlangıçta bir sohbet oluştur
+            createNewChat();
+        });
+    </script>
+</body>
+</html>
