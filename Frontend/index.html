@@ -1,10 +1,11 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MehuGPT - Medeni Hukuk Asistanı</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             --bg-dark: #121212;
@@ -220,10 +221,14 @@
         }
 
         .welcome-container {
+            display: flex !important; /* Bu satır önemli */
             margin: auto;
             text-align: center;
             padding: 40px 20px;
             max-width: 600px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .chat-title {
@@ -446,8 +451,7 @@
                 renderChatHistory();
                 switchToChat(chatId);
 
-                // Hoş geldin mesajını gizle ve mesaj alanını göster
-                welcomeContainer.style.display = 'none';
+                // Welcome mesajını gizleme kısmını kaldırdık
                 messageContainer.style.display = 'block';
             }
 
@@ -471,13 +475,11 @@
                     `;
 
                     chatItem.addEventListener('click', (e) => {
-                        // Silme butonuna tıklanmadıysa
                         if (!e.target.closest('.delete-chat')) {
                             switchToChat(chat.id);
                         }
                     });
 
-                    // Sohbet silme butonu
                     const deleteBtn = chatItem.querySelector('.delete-chat');
                     deleteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -493,7 +495,6 @@
                 if (confirm('Bu sohbeti silmek istediğinize emin misiniz?')) {
                     chats = chats.filter(chat => chat.id !== chatId);
 
-                    // Eğer silinen sohbet aktif sohbetse
                     if (activeChatId === chatId) {
                         if (chats.length > 0) {
                             activeChatId = chats[0].id;
@@ -512,10 +513,8 @@
                 activeChatId = chatId;
                 const chat = chats.find(c => c.id === chatId);
 
-                // Sohbet geçmişini güncelle
                 renderChatHistory();
 
-                // Mesajları yükle
                 messageContainer.innerHTML = '';
 
                 if (chat.messages.length > 0) {
@@ -530,11 +529,10 @@
                     messageContainer.style.display = 'none';
                 }
 
-                // En aşağı kaydır
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
 
-            // Mesaj ekle (hem arayüze hem de veriye)
+            // Mesaj ekle
             function addMessage(content, isUser) {
                 if (!activeChatId) {
                     createNewChat();
@@ -598,11 +596,10 @@
                 addMessage(message, true);
                 userInput.value = '';
 
-                // Bot yanıtı simüle et (gerçek uygulamada API çağrısı yapılacak)
                 simulateBotResponse(message);
             }
 
-            // Input event listeners
+            // Event listeners
             userInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -612,19 +609,17 @@
 
             sendBtn.addEventListener('click', sendMessage);
 
-            // Sesli giriş butonu
             voiceBtn.addEventListener('click', function() {
                 alert('Sesli giriş özelliği aktif edilecek');
             });
 
-            // Textarea otomatik yüksekliği
             userInput.addEventListener('input', function() {
                 this.style.height = 'auto';
                 this.style.height = (this.scrollHeight) + 'px';
             });
 
-            // Başlangıçta bir sohbet oluştur
-            createNewChat();
+            // Başlangıçta welcome ekranını göster
+            welcomeContainer.style.display = 'flex';
         });
     </script>
 </body>
