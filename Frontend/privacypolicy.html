@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gizlilik Politikası - MeHuGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-darker: #0a0a0a;
+            --bg-panel: #1e1e1e;
+            --primary-text: #e0e0e0;
+            --secondary-text: #a0a0a0;
+            --accent-color: #3a3a3a;
+            --input-bg: #2d2d2d;
+            --border-color: #333;
+            --primary-blue: #1a73e8;
+            --success-green: #34a853;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--primary-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-blue);
+        }
+
+        .header p {
+            color: var(--secondary-text);
+        }
+
+        .content-section {
+            background-color: var(--bg-panel);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: var(--primary-text);
+            margin: 25px 0 15px;
+            font-size: 1.3rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 15px;
+            color: var(--secondary-text);
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background-color: rgba(52, 168, 83, 0.1);
+            padding: 15px;
+            border-left: 3px solid var(--success-green);
+            margin: 20px 0;
+        }
+
+        .warning {
+            background-color: rgba(234, 67, 53, 0.1);
+            padding: 15px;
+            border-left: 3px solid #ea4335;
+            margin: 20px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: var(--primary-blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #1557b0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: var(--accent-color);
+            color: var(--primary-text);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content-section {
+                padding: 20px;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> MeHuGPT Gizlilik Politikası</h1>
+            <p>Son güncelleme: 06 Nisan 2025</p>
+        </div>
+
+        <div class="content-section">
+            <h2>1. Toplanan Bilgiler</h2>
+            <p>MeHuGPT olarak, hizmetlerimizi sunarken aşağıdaki bilgileri topluyoruz:</p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Veri Türü</th>
+                        <th>Toplama Amacı</th>
+                        <th>Saklama Süresi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Kişisel bilgiler (ad, e-posta)</td>
+                        <td>Hesap oluşturma ve doğrulama</td>
+                        <td>Hesap aktif olduğu sürece</td>
+                    </tr>
+                    <tr>
+                        <td>Kullanım verileri (sorgular, etkileşimler)</td>
+                        <td>Hizmet iyileştirme ve kişiselleştirme</td>
+                        <td>3 yıl</td>
+                    </tr>
+                    <tr>
+                        <td>Teknik veriler (IP, cihaz bilgisi)</td>
+                        <td>Güvenlik ve analiz</td>
+                        <td>1 yıl</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight">
+                <p><strong>Şeffaflık Taahhüdümüz:</strong> Verilerinizi asla üçüncü taraflara satmayız ve yalnızca bu politikada belirtilen amaçlarla kullanırız.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>2. Veri Kullanımı</h2>
+
+            <h3>2.1. Hizmet Sağlama</h3>
+            <ul>
+                <li>Hesap yönetimi ve doğrulama</li>
+                <li>Kullanıcı destek hizmetleri</li>
+                <li>Platform güvenliğinin sağlanması</li>
+            </ul>
+
+            <h3>2.2. İyileştirme ve Analiz</h3>
+            <ul>
+                <li>Yapay zeka modelinin geliştirilmesi</li>
+                <li>Kullanıcı deneyiminin iyileştirilmesi</li>
+                <li>Yeni özelliklerin tasarlanması</li>
+            </ul>
+
+            <div class="warning">
+                <p><strong>Önemli:</strong> Hukuki danışmanlık amacıyla paylaştığınız özel bilgiler, avukat-müvekkil gizliliği kapsamında korunmaz.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>3. Veri Paylaşımı</h2>
+            <p>Verileriniz yalnızca aşağıdaki durumlarda paylaşılabilir:</p>
+
+            <h3>3.1. Yasal Zorunluluklar</h3>
+            <p>Mahkeme kararı veya yasal düzenlemeler gerektiğinde yetkili makamlarla paylaşılabilir.</p>
+
+            <h3>3.2. Hizmet Sağlayıcılar</h3>
+            <p>Sunucu barındırma, analiz gibi hizmetler için sınırlı erişim verilen üçüncü taraflar.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>4. Veri Güvenliği</h2>
+            <p>Verilerinizi korumak için endüstri standartlarında önlemler alıyoruz:</p>
+            <ul>
+                <li>Veri şifreleme (SSL/TLS)</li>
+                <li>Düzenli güvenlik denetimleri</li>
+                <li>Sınırlı personel erişimi</li>
+                <li>Güvenlik duvarları ve DDoS koruması</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>5. Haklarınız</h2>
+            <p>KVKK kapsamında aşağıdaki haklara sahipsiniz:</p>
+
+            <ul>
+                <li>Bilgilerinize erişim</li>
+                <li>Düzeltme talep etme</li>
+                <li>Silinmesini isteme</li>
+                <li>İşleme itiraz etme</li>
+                <li>Veri taşınabilirliği</li>
+            </ul>
+
+            <p>Haklarınızı kullanmak için <a href="mailto:kvkk@mehugpt.com" style="color: var(--primary-blue);">kvkk@mehugpt.com</a> adresinden bizimle iletişime geçebilirsiniz.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>6. Çerez Politikası</h2>
+            <p>Platformumuz aşağıdaki çerez türlerini kullanmaktadır:</p>
+
+            <h3>6.1. Zorunlu Çerezler</h3>
+            <p>Temel işlevselliği sağlamak için gereklidir.</p>
+
+            <h3>6.2. Performans Çerezleri</h3>
+            <p>Kullanım analizleri için kullanılır, devre dışı bırakılabilir.</p>
+        </div>
+
+        <div class="footer">
+            <a href="signup.html" class="back-button"><i class="fas fa-arrow-left"></i> Kayıt Sayfasına Dön</a>
+            <p>© 2025 MeHuGPT - Tüm hakları saklıdır</p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">Bu politika 6698 sayılı KVKK ve GDPR uyumludur</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MehuGPT - Medeni Hukuk Asistanı</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
             --bg-dark: #121212;
@@ -18,6 +17,8 @@
             --border-color: #333;
             --user-message: #553d2f;
             --bot-message: #2d2d2d;
+            --sidebar-width: 280px;
+            --primary-blue: #1a73e8;
         }
 
         * {
@@ -37,13 +38,15 @@
 
         /* Sol Panel */
         .sidebar {
-            width: 280px;
+            width: var(--sidebar-width);
             background-color: var(--bg-darker);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             height: 100vh;
             transition: transform 0.3s ease;
+            position: fixed;
+            z-index: 100;
         }
 
         .sidebar.collapsed {
@@ -74,14 +77,6 @@
             margin-right: 5px;
         }
 
-        .toggle-sidebar {
-            background: none;
-            border: none;
-            color: var(--secondary-text);
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
         .search-bar {
             padding: 15px;
             border-bottom: 1px solid var(--border-color);
@@ -110,12 +105,6 @@
             align-items: center;
             justify-content: space-between;
             border-left: 3px solid transparent;
-        }
-
-        .chat-item-content {
-            display: flex;
-            align-items: center;
-            flex: 1;
         }
 
         .chat-item:hover {
@@ -182,6 +171,14 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 0;
+            width: 100%;
         }
 
         .top-bar {
@@ -192,13 +189,56 @@
             border-bottom: 1px solid var(--border-color);
         }
 
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .toggle-sidebar-main {
             background: none;
             border: none;
             color: var(--secondary-text);
             cursor: pointer;
             font-size: 1.2rem;
-            margin-right: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .main-content .toggle-sidebar-main {
+            transform: rotate(90deg);
+        }
+
+        .app-title-button {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            font: inherit;
+            color: inherit;
+        }
+
+        .app-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .app-title:hover {
+            opacity: 0.8;
+        }
+
+        .app-logo {
+            font-size: 1.2rem;
+            color: #85898c;
+            transition: transform 0.3s;
+        }
+
+        .app-title-button:hover .app-logo {
+            transform: rotate(15deg);
         }
 
         .profile {
@@ -210,8 +250,10 @@
         .profile i {
             margin-left: 8px;
             color: var(--secondary-text);
+            font-size: 1.4rem;
         }
 
+        /* Chat Container */
         .chat-container {
             flex: 1;
             overflow-y: auto;
@@ -221,7 +263,7 @@
         }
 
         .welcome-container {
-            display: flex !important; /* Bu satır önemli */
+            display: flex !important;
             margin: auto;
             text-align: center;
             padding: 40px 20px;
@@ -229,6 +271,11 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            width: 100%;
+        }
+
+        .sidebar.collapsed ~ .main-content .welcome-container {
+            max-width: 800px;
         }
 
         .chat-title {
@@ -251,6 +298,10 @@
             width: 100%;
             margin: 0 auto;
             display: none;
+        }
+
+        .sidebar.collapsed ~ .main-content .message-container {
+            max-width: 1000px;
         }
 
         .message {
@@ -292,6 +343,10 @@
             position: relative;
         }
 
+        .sidebar.collapsed ~ .main-content .input-container {
+            max-width: 1000px;
+        }
+
         .input-box {
             width: 100%;
             padding: 15px 50px 15px 20px;
@@ -326,13 +381,30 @@
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
-                position: absolute;
+                position: fixed;
                 z-index: 100;
                 height: 100%;
             }
 
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .sidebar:not(.collapsed) {
+                z-index: 1000;
+            }
+
             .chat-title {
                 font-size: 2rem;
+            }
+
+            .app-title {
+                font-size: 1rem;
+            }
+
+            .app-logo {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -344,9 +416,6 @@
             <button class="new-chat-btn" id="new-chat-btn">
                 <i class="fas fa-plus"></i>
                 <span>Yeni Sohbet</span>
-            </button>
-            <button class="toggle-sidebar" id="toggle-sidebar">
-                <i class="fas fa-times"></i>
             </button>
         </div>
 
@@ -362,9 +431,15 @@
     <!-- Ana İçerik -->
     <div class="main-content">
         <div class="top-bar">
-            <div>
+            <div class="top-bar-left">
                 <button class="toggle-sidebar-main" id="toggle-sidebar-main">
                     <i class="fas fa-bars"></i>
+                </button>
+                <button class="app-title-button" id="home-button">
+                    <div class="app-title">
+                        <i class="fas fa-balance-scale app-logo"></i>
+                        <span>MeHuGPT</span>
+                    </div>
                 </button>
             </div>
             <div class="profile-dropdown">
@@ -373,9 +448,9 @@
                     <i class="fas fa-user-circle"></i>
                 </div>
                 <div class="dropdown-content">
-                    <a href="#"><i class="fas fa-user"></i> Profil</a>
-                    <a href="#"><i class="fas fa-cog"></i> Ayarlar</a>
-                    <a href="#"><i class="fas fa-sign-out-alt"></i> Oturumu Kapat</a>
+                    <a href="profile.html"><i class="fas fa-user"></i> Profil</a>
+                    <a href="settings.html"><i class="fas fa-cog"></i> Ayarlar</a>
+                    <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Oturumu Kapat</a>
                 </div>
             </div>
         </div>
@@ -412,7 +487,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elementleri
             const sidebar = document.querySelector('.sidebar');
-            const toggleSidebar = document.getElementById('toggle-sidebar');
             const toggleSidebarMain = document.getElementById('toggle-sidebar-main');
             const newChatBtn = document.getElementById('new-chat-btn');
             const chatHistory = document.getElementById('chat-history');
@@ -422,6 +496,12 @@
             const userInput = document.getElementById('user-input');
             const sendBtn = document.getElementById('send-btn');
             const voiceBtn = document.getElementById('voice-btn');
+            const homeButton = document.getElementById('home-button');
+
+            // Ana sayfa butonu
+            homeButton.addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
 
             // Sohbet geçmişi ve aktif sohbet
             let chats = [];
@@ -432,7 +512,6 @@
                 sidebar.classList.toggle('collapsed');
             }
 
-            toggleSidebar.addEventListener('click', toggleSidebarFunc);
             toggleSidebarMain.addEventListener('click', toggleSidebarFunc);
 
             // Yeni sohbet oluştur
@@ -451,7 +530,6 @@
                 renderChatHistory();
                 switchToChat(chatId);
 
-                // Welcome mesajını gizleme kısmını kaldırdık
                 messageContainer.style.display = 'block';
             }
 

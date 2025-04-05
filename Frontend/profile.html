@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - MehuGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-darker: #0a0a0a;
+            --bg-panel: #1e1e1e;
+            --primary-text: #e0e0e0;
+            --secondary-text: #a0a0a0;
+            --accent-color: #3a3a3a;
+            --input-bg: #2d2d2d;
+            --border-color: #333;
+            --primary-blue: #1a73e8;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --premium-color: #ffd700;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--primary-text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sol Panel */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-darker);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: transform 0.3s ease;
+            position: fixed;
+            z-index: 100;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .new-chat-btn {
+            background-color: var(--accent-color);
+            color: var(--primary-text);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .new-chat-btn i {
+            margin-right: 5px;
+        }
+
+        .search-bar {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--primary-text);
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .chat-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 3px solid transparent;
+        }
+
+        .chat-item:hover {
+            background-color: var(--bg-panel);
+        }
+
+        .chat-item.active {
+            background-color: var(--accent-color);
+            border-left: 3px solid var(--primary-text);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--bg-panel);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .dropdown-content a {
+            color: var(--primary-text);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--accent-color);
+        }
+
+        .profile-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Ana İçerik */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .top-bar {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toggle-sidebar-main {
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .main-content .toggle-sidebar-main {
+            transform: rotate(90deg);
+        }
+
+        .app-title-button {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            font: inherit;
+            color: inherit;
+        }
+
+        .app-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .app-title:hover {
+            opacity: 0.8;
+        }
+
+        .app-logo {
+            font-size: 1.2rem;
+            color: #85898c;
+            transition: transform 0.3s;
+        }
+
+        .app-title-button:hover .app-logo {
+            transform: rotate(15deg);
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .profile i {
+            margin-left: 8px;
+            color: var(--secondary-text);
+            font-size: 1.4rem;
+        }
+
+        /* Geliştirilmiş Profil Sayfası */
+        .profile-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-header p {
+            color: var(--secondary-text);
+            font-size: 0.95rem;
+        }
+
+        .profile-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            cursor: pointer;
+            font-size: 0.95rem;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-text);
+            font-weight: 500;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-blue);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Genel Bilgiler Sekmesi */
+        .profile-card {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .profile-avatar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 150px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary-text);
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-edit {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0,0,0,0.7);
+            padding: 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .profile-avatar:hover .avatar-edit {
+            display: block;
+        }
+
+        .change-avatar-btn {
+            background-color: var(--accent-color);
+            color: var(--primary-text);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .membership-badge {
+            background-color: var(--premium-color);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .profile-email {
+            color: var(--secondary-text);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-darker);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-label {
+            color: var(--secondary-text);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-card {
+            background-color: var(--bg-panel);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-card h3 i {
+            color: var(--secondary-text);
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .detail-label {
+            width: 150px;
+            color: var(--secondary-text);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        /* Düzenleme Formu */
+        .edit-form {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--primary-text);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            border: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0d5bba;
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color);
+            color: var(--primary-text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #4a4a4a;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        /* Üyelik Sekmesi */
+        .membership-plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .plan-card {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .plan-card.recommended {
+            border: 2px solid var(--premium-color);
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background-color: var(--premium-color);
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .plan-name {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .plan-price {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .plan-period {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+
+        .plan-features {
+            margin-bottom: 20px;
+        }
+
+        .plan-feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .plan-feature i {
+            color: var(--success-color);
+        }
+
+        /* Aktivite Sekmesi */
+        .activity-timeline {
+            margin-top: 20px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .timeline-date {
+            color: var(--secondary-text);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                z-index: 100;
+                height: 100%;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .sidebar:not(.collapsed) {
+                z-index: 1000;
+            }
+
+            .profile-card {
+                flex-direction: column;
+            }
+
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-tabs {
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.85rem;
+                white-space: nowrap;
+            }
+
+            .membership-plans {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sol Panel -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" id="new-chat-btn">
+                <i class="fas fa-plus"></i>
+                <span>Yeni Sohbet</span>
+            </button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Sohbet ara...">
+        </div>
+
+        <div class="chat-history" id="chat-history">
+            <!-- Sohbet geçmişi buraya dinamik olarak eklenecek -->
+        </div>
+    </div>
+
+    <!-- Ana İçerik -->
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <button class="toggle-sidebar-main" id="toggle-sidebar-main">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button class="app-title-button" id="home-button">
+                    <div class="app-title">
+                        <i class="fas fa-balance-scale app-logo"></i>
+                        <span>MeHuGPT</span>
+                    </div>
+                </button>
+            </div>
+            <div class="profile-dropdown">
+                <div class="profile">
+                    <span id="profile-username">My Profile</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a href="profile.html"><i class="fas fa-user"></i> Profil</a>
+                    <a href="settings.html"><i class="fas fa-cog"></i> Ayarlar</a>
+                    <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Oturumu Kapat</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-container">
+            <div class="profile-header">
+                <div>
+                    <h1><i class="fas fa-user-circle"></i> Profilim</h1>
+                    <p>Kişisel bilgilerinizi ve hesap ayarlarınızı yönetin</p>
+                </div>
+                <button class="btn btn-primary" id="edit-profile-btn">
+                    <i class="fas fa-edit"></i> Profili Düzenle
+                </button>
+            </div>
+
+            <div class="profile-tabs">
+                <button class="tab-btn active" data-tab="overview"><i class="fas fa-user"></i> Genel Bakış</button>
+                <button class="tab-btn" data-tab="membership"><i class="fas fa-crown"></i> Üyelik</button>
+                <button class="tab-btn" data-tab="activity"><i class="fas fa-history"></i> Aktivite</button>
+                <button class="tab-btn" data-tab="security"><i class="fas fa-shield-alt"></i> Güvenlik</button>
+            </div>
+
+            <!-- Genel Bakış Sekmesi -->
+            <div class="tab-content active" id="overview-tab">
+                <div class="profile-card">
+                    <div class="profile-avatar-container">
+                        <div class="profile-avatar" id="profile-avatar">
+                            <span id="avatar-text">A</span>
+                            <div class="avatar-edit">Değiştir</div>
+                        </div>
+                        <button class="change-avatar-btn" id="change-avatar-btn">
+                            <i class="fas fa-camera"></i> Fotoğraf Değiştir
+                        </button>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name">
+                            <span id="display-name">Ali Gaffar Toksoy</span>
+                            <span class="membership-badge" id="membership-badge">PREMIUM</span>
+                        </div>
+                        <div class="profile-email" id="profile-email">gaffartoksoy@gmail.com</div>
+
+                        <div class="profile-stats">
+                            <div class="stat-card">
+                                <div class="stat-label">Toplam Sohbet</div>
+                                <div class="stat-value" id="total-chats">24</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Son Aktivite</div>
+                                <div class="stat-value" id="last-activity">2 saat önce</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Üyelik Süresi</div>
+                                <div class="stat-value" id="membership-duration">3 ay</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-details">
+                            <div class="detail-card">
+                                <h3><i class="fas fa-info-circle"></i> Temel Bilgiler</h3>
+                                <div class="detail-row">
+                                    <div class="detail-label">Tam Adı</div>
+                                    <div class="detail-value" id="full-name-value">Ali Gaffar Toksoy</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">E-posta</div>
+                                    <div class="detail-value" id="email-value">gaffartoksoy@gmail.com</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Telefon</div>
+                                    <div class="detail-value" id="phone-value">+90 555 123 45 67</div>
+                                </div>
+                            </div>
+
+                            <div class="detail-card">
+                                <h3><i class="fas fa-briefcase"></i> Mesleki Bilgiler</h3>
+                                <div class="detail-row">
+                                    <div class="detail-label">Meslek</div>
+                                    <div class="detail-value" id="profession-value">Avukat</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Uzmanlık</div>
+                                    <div class="detail-value" id="expertise-value">Medeni Hukuk, Aile Hukuku</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Baro No</div>
+                                    <div class="detail-value" id="bar-number-value">İstanbul Barosu - 12345</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Üyelik Sekmesi -->
+            <div class="tab-content" id="membership-tab">
+                <div class="profile-card">
+                    <h2 style="margin-bottom: 20px;"><i class="fas fa-crown"></i> Mevcut Üyeliğiniz</h2>
+                    <div class="detail-card" style="background-color: rgba(255, 215, 0, 0.1); border-color: var(--premium-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div>
+                                <h3 style="color: var(--premium-color);">Premium Üyelik</h3>
+                                <p style="color: var(--secondary-text); font-size: 0.9rem;">Son yenileme: 15 Mayıs 2025</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--premium-color);">₺99,99<small style="font-size: 0.9rem; color: var(--secondary-text);">/ay</small></div>
+                                <p style="color: var(--secondary-text); font-size: 0.9rem;">Sonraki ödeme: 15 Haziran 2025</p>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-sync-alt"></i> Üyeliği Yenile
+                            </button>
+                            <button class="btn btn-danger">
+                                <i class="fas fa-times-circle"></i> Üyeliği İptal Et
+                            </button>
+                        </div>
+                    </div>
+
+                    <h2 style="margin: 30px 0 20px;"><i class="fas fa-box-open"></i> Üyelik Planları</h2>
+                    <div class="membership-plans">
+                        <div class="plan-card">
+                            <div class="plan-name">
+                                <i class="fas fa-user"></i> Standart
+                            </div>
+                            <div class="plan-price">
+                                ₺0 <span class="plan-period">/ay</span>
+                            </div>
+                            <div class="plan-features">
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Günlük 5 sohbet hakkı
+                                </div>
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Temel hukuki bilgiler
+                                </div>
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Sınırlı referans erişimi
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%;">
+                                Mevcut Planınız
+                            </button>
+                        </div>
+
+                        <div class="plan-card recommended">
+                            <div class="recommended-badge">ÖNERİLEN</div>
+                            <div class="plan-name">
+                                <i class="fas fa-crown"></i> Premium
+                            </div>
+                            <div class="plan-price">
+                                ₺99,99 <span class="plan-period">/ay</span>
+                            </div>
+                            <div class="plan-features">
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Sınırsız sohbet
+                                </div>
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Detaylı hukuki analizler
+                                </div>
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Tam referans erişimi
+                                </div>
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Öncelikli destek
+                                </div>
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> PDF dışa aktarma
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-check"></i> Aktif Planınız
+                            </button>
+                        </div>
+
+                        <div class="plan-card">
+                            <div class="plan-name">
+                                <i class="fas fa-building"></i> Kurumsal
+                            </div>
+                            <div class="plan-price">
+                                Özel Fiyat <span class="plan-period">/ay</span>
+                            </div>
+                            <div class="plan-features">
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Çoklu kullanıcı
+                                </div>
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Özel eğitimler
+                                </div>
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> API erişimi
+                                </div>
+                                <div class="plan-feature">
+                                    <i class="fas fa-check"></i> Özel danışmanlık
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%;">
+                                <i class="fas fa-phone-alt"></i> İletişime Geçin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aktivite Sekmesi -->
+            <div class="tab-content" id="activity-tab">
+                <div class="profile-card">
+                    <h2 style="margin-bottom: 20px;"><i class="fas fa-history"></i> Son Aktivite Geçmişi</h2>
+
+                    <div class="activity-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">"Miras paylaşımı" konulu sohbet başlatıldı</div>
+                                <div class="timeline-date">Bugün, 14:32</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">"Boşanma süreci" sohbeti PDF olarak dışa aktarıldı</div>
+                                <div class="timeline-date">Dün, 18:15</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Profil bilgileri güncellendi</div>
+                                <div class="timeline-date">2 gün önce, 09:42</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">"Kira sözleşmesi" konulu sohbet başlatıldı</div>
+                                <div class="timeline-date">3 gün önce, 16:20</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Premium üyeliğe yükseltme yapıldı</div>
+                                <div class="timeline-date">1 hafta önce, 11:05</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Güvenlik Sekmesi -->
+            <div class="tab-content" id="security-tab">
+                <div class="profile-card">
+                    <h2 style="margin-bottom: 20px;"><i class="fas fa-shield-alt"></i> Hesap Güvenliği</h2>
+
+                    <div class="detail-card">
+                        <h3><i class="fas fa-key"></i> Şifre Değiştirme</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="current-password">Mevcut Şifre</label>
+                                <input type="password" id="current-password" placeholder="Mevcut şifrenizi girin">
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">Yeni Şifre</label>
+                                <input type="password" id="new-password" placeholder="En az 8 karakter">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">Yeni Şifre (Tekrar)</label>
+                                <input type="password" id="confirm-password" placeholder="Yeni şifrenizi tekrar girin">
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-save"></i> Şifreyi Değiştir
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3><i class="fas fa-mobile-alt"></i> İki Adımlı Doğrulama</h3>
+                        <div class="detail-row">
+                            <div class="detail-label">Durum</div>
+                            <div class="detail-value">Kapalı</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Açıklama</div>
+                            <div class="detail-value">Hesap güvenliğinizi artırmak için iki adımlı doğrulamayı etkinleştirin</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-lock"></i> Etkinleştir
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3><i class="fas fa-sign-out-alt"></i> Oturum Yönetimi</h3>
+                        <div class="detail-row">
+                            <div class="detail-label">Aktif Oturumlar</div>
+                            <div class="detail-value">3 cihaz</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-list"></i> Tüm Oturumları Görüntüle
+                            </button>
+                            <button class="btn btn-danger">
+                                <i class="fas fa-sign-out-alt"></i> Diğer Tüm Oturumları Sonlandır
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profil Düzenleme Formu -->
+            <div class="edit-form" id="edit-profile-form">
+                <div class="profile-card">
+                    <h2 style="margin-bottom: 20px;"><i class="fas fa-edit"></i> Profil Bilgilerini Düzenle</h2>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="edit-full-name">Tam Adınız</label>
+                            <input type="text" id="edit-full-name" value="Ali Gaffar Toksoy">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-email">E-posta Adresi</label>
+                            <input type="email" id="edit-email" value="gaffartoksoy@gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-phone">Telefon Numarası</label>
+                            <input type="tel" id="edit-phone" value="+90 555 123 45 67">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-profession">Meslek</label>
+                            <select id="edit-profession">
+                                <option>Avukat</option>
+                                <option selected>Hukuk Öğrencisi</option>
+                                <option>Hakim</option>
+                                <option>Savcı</option>
+                                <option>Hukuk Danışmanı</option>
+                                <option>Diğer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-expertise">Uzmanlık Alanları</label>
+                            <input type="text" id="edit-expertise" value="Medeni Hukuk, Aile Hukuku">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-bar-number">Baro No / Üniversite</label>
+                            <input type="text" id="edit-bar-number" value="İstanbul Barosu - 12345">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-bio">Kısa Profil Bilgisi</label>
+                        <textarea id="edit-bio">10 yıldan fazla deneyimli medeni hukuk avukatı. Özellikle aile hukuku ve miras davalarında uzmanlaştım.</textarea>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="save-profile-btn">
+                            <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                        </button>
+                        <button class="btn btn-secondary" id="cancel-edit-btn">
+                            <i class="fas fa-times"></i> İptal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elementleri
+            const sidebar = document.querySelector('.sidebar');
+            const toggleSidebarMain = document.getElementById('toggle-sidebar-main');
+            const newChatBtn = document.getElementById('new-chat-btn');
+            const homeButton = document.getElementById('home-button');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const editProfileBtn = document.getElementById('edit-profile-btn');
+            const editProfileForm = document.getElementById('edit-profile-form');
+            const saveProfileBtn = document.getElementById('save-profile-btn');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+            const changeAvatarBtn = document.getElementById('change-avatar-btn');
+            const profileAvatar = document.getElementById('profile-avatar');
+            const avatarText = document.getElementById('avatar-text');
+
+            // Kullanıcı verileri (gerçek uygulamada sunucudan alınacak)
+            let userData = {
+                fullName: "Ali Gaffar Toksoy",
+                email: "gaffartoksoy@gmail.com",
+                phone: "+90 555 123 45 67",
+                profession: "Avukat",
+                expertise: "Medeni Hukuk, Aile Hukuku",
+                barNumber: "İstanbul Barosu - 12345",
+                bio: "10 yıldan fazla deneyimli medeni hukuk avukatı. Özellikle aile hukuku ve miras davalarında uzmanlaştım.",
+                membership: "Premium",
+                joinDate: "15 Mart 2025",
+                totalChats: 24,
+                lastActivity: "2 saat önce"
+            };
+
+            // Sayfa yüklendiğinde kullanıcı verilerini göster
+            function loadUserData() {
+                // Profil bilgileri
+                document.getElementById('display-name').textContent = userData.fullName;
+                document.getElementById('profile-username').textContent = userData.fullName;
+                document.getElementById('full-name-value').textContent = userData.fullName;
+                document.getElementById('profile-email').textContent = userData.email;
+                document.getElementById('email-value').textContent = userData.email;
+                document.getElementById('phone-value').textContent = userData.phone;
+                document.getElementById('profession-value').textContent = userData.profession;
+                document.getElementById('expertise-value').textContent = userData.expertise;
+                document.getElementById('bar-number-value').textContent = userData.barNumber;
+
+                // İstatistikler
+                document.getElementById('total-chats').textContent = userData.totalChats;
+                document.getElementById('last-activity').textContent = userData.lastActivity;
+                document.getElementById('membership-duration').textContent = getMembershipDuration(userData.joinDate);
+
+                // Avatar baş harfi
+                avatarText.textContent = userData.fullName.charAt(0).toUpperCase();
+
+                // Üyelik durumu
+                const membershipBadge = document.getElementById('membership-badge');
+                membershipBadge.textContent = userData.membership.toUpperCase();
+                if(userData.membership === "Premium") {
+                    membershipBadge.style.backgroundColor = "var(--premium-color)";
+                    membershipBadge.style.color = "#000";
+                } else {
+                    membershipBadge.style.backgroundColor = "var(--accent-color)";
+                    membershipBadge.style.color = "var(--primary-text)";
+                }
+            }
+
+            // Üyelik süresini hesapla
+            function getMembershipDuration(joinDate) {
+                const join = new Date(joinDate);
+                const now = new Date();
+                const diffMonths = (now.getFullYear() - join.getFullYear()) * 12 + (now.getMonth() - join.getMonth());
+
+                if(diffMonths < 1) return "1 aydan az";
+                if(diffMonths < 12) return `${diffMonths} ay`;
+
+                const years = Math.floor(diffMonths / 12);
+                const months = diffMonths % 12;
+
+                if(months === 0) return `${years} yıl`;
+                return `${years} yıl ${months} ay`;
+            }
+
+            // Panel aç/kapa
+            function toggleSidebarFunc() {
+                sidebar.classList.toggle('collapsed');
+            }
+
+            // Ana sayfa butonu
+            homeButton.addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+
+            toggleSidebarMain.addEventListener('click', toggleSidebarFunc);
+
+            // Yeni sohbet oluştur
+            function createNewChat() {
+                alert('Yeni sohbet oluşturulacak');
+            }
+
+            newChatBtn.addEventListener('click', createNewChat);
+
+            // Tab geçişleri
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+
+                    // Tüm tab butonlarını ve içeriklerini pasif yap
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Aktif tabı ve içeriği aktif yap
+                    button.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+
+            // Profil düzenleme
+            editProfileBtn.addEventListener('click', function() {
+                editProfileForm.style.display = 'block';
+
+                // Formu mevcut verilerle doldur
+                document.getElementById('edit-full-name').value = userData.fullName;
+                document.getElementById('edit-email').value = userData.email;
+                document.getElementById('edit-phone').value = userData.phone;
+                document.getElementById('edit-profession').value = userData.profession;
+                document.getElementById('edit-expertise').value = userData.expertise;
+                document.getElementById('edit-bar-number').value = userData.barNumber;
+                document.getElementById('edit-bio').value = userData.bio;
+            });
+
+            // Düzenlemeyi iptal et
+            cancelEditBtn.addEventListener('click', function() {
+                editProfileForm.style.display = 'none';
+            });
+
+            // Değişiklikleri kaydet
+            saveProfileBtn.addEventListener('click', function() {
+                const newFullName = document.getElementById('edit-full-name').value;
+                const newEmail = document.getElementById('edit-email').value;
+                const newPhone = document.getElementById('edit-phone').value;
+                const newProfession = document.getElementById('edit-profession').value;
+                const newExpertise = document.getElementById('edit-expertise').value;
+                const newBarNumber = document.getElementById('edit-bar-number').value;
+                const newBio = document.getElementById('edit-bio').value;
+
+                // Validasyon
+                if(!newFullName || !newEmail) {
+                    alert('Ad ve e-posta alanları zorunludur');
+                    return;
+                }
+
+                // Verileri güncelle
+                userData.fullName = newFullName;
+                userData.email = newEmail;
+                userData.phone = newPhone;
+                userData.profession = newProfession;
+                userData.expertise = newExpertise;
+                userData.barNumber = newBarNumber;
+                userData.bio = newBio;
+
+                // Sayfayı yenile
+                loadUserData();
+                editProfileForm.style.display = 'none';
+
+                alert('Profil bilgileriniz başarıyla güncellendi');
+            });
+
+            // Avatar değiştirme
+            changeAvatarBtn.addEventListener('click', function() {
+                alert('Avatar değiştirme özelliği yakında eklenecek');
+            });
+
+            profileAvatar.addEventListener('click', function() {
+                alert('Avatar değiştirme özelliği yakında eklenecek');
+            });
+
+            // Sayfa yüklendiğinde verileri yükle
+            loadUserData();
+        });
+    </script>
+</body>
+</html>

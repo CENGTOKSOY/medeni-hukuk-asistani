@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap - MehuGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-darker: #0a0a0a;
+            --bg-panel: #1e1e1e;
+            --primary-text: #e0e0e0;
+            --secondary-text: #a0a0a0;
+            --accent-color: #3a3a3a;
+            --input-bg: #2d2d2d;
+            --border-color: #333;
+            --primary-blue: #1a73e8;
+            --error-red: #ea4335;
+            --success-green: #34a853;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--primary-text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Login Container */
+        .login-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* Left Panel */
+        .login-left {
+            flex: 1;
+            background-color: var(--bg-darker);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            border-right: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-left::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(26,115,232,0.1) 0%, rgba(0,0,0,0) 70%);
+            z-index: 0;
+        }
+
+        .login-left-content {
+            position: relative;
+            z-index: 1;
+            max-width: 400px;
+        }
+
+        /* Right Panel */
+        .login-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--bg-dark);
+        }
+
+        /* Login Card */
+        .login-card {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--success-green));
+        }
+
+        /* Logo Section */
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo i {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+
+        .login-logo h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--success-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-logo p {
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+        }
+
+        /* Form Elements */
+        .login-form .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--primary-text);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 38px;
+            color: var(--secondary-text);
+        }
+
+        /* Remember & Forgot */
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .forgot-password a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .forgot-password a:hover {
+            color: #185abc;
+            text-decoration: underline;
+        }
+
+        /* Buttons */
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .login-btn:hover {
+            background-color: #185abc;
+        }
+
+        /* Social Login */
+        .social-login {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .social-login p {
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .social-login p::before,
+        .social-login p::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background-color: var(--border-color);
+        }
+
+        .social-login p::before {
+            left: 0;
+        }
+
+        .social-login p::after {
+            right: 0;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--input-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .social-icon:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* Register Link */
+        .register-link {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+
+        .register-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .register-link a:hover {
+            color: #185abc;
+            text-decoration: underline;
+        }
+
+        /* Error Message */
+        .error-message {
+            color: var(--error-red);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Success Message */
+        .success-message {
+            color: var(--success-green);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        /* Responsive */
+        @media (min-width: 992px) {
+            .login-left {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+
+            .login-logo h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Panel (Visible on large screens) -->
+        <div class="login-left">
+            <div class="login-left-content">
+                <i class="fas fa-balance-scale" style="font-size: 4rem; color: var(--primary-blue); margin-bottom: 20px;"></i>
+                <h2 style="font-size: 2rem; margin-bottom: 15px; color: var(--primary-text);">MeHuGPT'ye Hoş Geldiniz</h2>
+                <p style="color: var(--secondary-text); line-height: 1.6; margin-bottom: 30px;">
+                    Medeni Hukuk alanında uzmanlaşmış yapay zeka asistanınız. Hukuki sorularınıza anında yanıt alın, doktrin ve yargıtay kararlarına erişin.
+                </p>
+                <ul style="color: var(--secondary-text); list-style-type: none;">
+                    <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                        <i class="fas fa-check-circle" style="color: var(--primary-blue); margin-right: 10px; margin-top: 3px;"></i>
+                        <span>Medeni Hukuk uzmanı yapay zeka</span>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                        <i class="fas fa-check-circle" style="color: var(--primary-blue); margin-right: 10px; margin-top: 3px;"></i>
+                        <span>Güncel Yargıtay kararları</span>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                        <i class="fas fa-check-circle" style="color: var(--primary-blue); margin-right: 10px; margin-top: 3px;"></i>
+                        <span>Kişiselleştirilmiş hukuki analiz</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Panel (Login Form) -->
+        <div class="login-right">
+            <div class="login-card">
+                <div class="login-logo">
+                    <i class="fas fa-balance-scale"></i>
+                    <h1>MeHuGPT</h1>
+                    <p>Medeni Hukuk Asistanına Giriş Yapın</p>
+                </div>
+
+                <!-- Success message (shown after registration) -->
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i> Kayıt işlemi başarılı! Lütfen giriş yapın.
+                </div>
+
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="email">E-posta Adresi</label>
+                        <input type="email" id="email" name="email" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                        <div class="error-message" id="emailError">Geçerli bir e-posta adresi giriniz</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Şifre</label>
+                        <input type="password" id="password" name="password" required>
+                        <i class="fas fa-lock input-icon"></i>
+                        <div class="error-message" id="passwordError">Şifre en az 8 karakter olmalıdır</div>
+                    </div>
+
+                    <div class="remember-forgot">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember" name="remember">
+                            <label for="remember">Beni Hatırla</label>
+                        </div>
+                        <div class="forgot-password">
+                            <a href="#" id="forgotPassword">Şifremi Unuttum?</a>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn">Giriş Yap</button>
+
+                    <div class="social-login">
+                        <p>Veya şununla giriş yapın</p>
+                        <div class="social-icons">
+                            <div class="social-icon" title="Google ile giriş">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="social-icon" title="Microsoft ile giriş">
+                                <i class="fab fa-microsoft"></i>
+                            </div>
+                            <div class="social-icon" title="Apple ile giriş">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="register-link">
+                        Hesabınız yok mu? <a href="signup.html">Kayıt Olun</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const successMessage = document.getElementById('successMessage');
+            const forgotPasswordLink = document.getElementById('forgotPassword');
+
+            // URL'den gelen parametreleri kontrol et
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Kayıt sonrası mesajı göster
+            if(urlParams.has('registered')) {
+                successMessage.style.display = 'block';
+            }
+
+            // Çıkış sonrası mesajı göster
+            if(urlParams.has('logout')) {
+                successMessage.textContent = 'Başarıyla çıkış yaptınız. Tekrar giriş yapabilirsiniz.';
+                successMessage.style.display = 'block';
+            }
+
+            // Şifre sıfırlama isteği sonrası mesaj
+            if(urlParams.has('reset')) {
+                successMessage.textContent = 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.';
+                successMessage.style.display = 'block';
+            }
+
+            // E-posta validasyonu
+            emailInput.addEventListener('input', function() {
+                const email = emailInput.value;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if(email && !emailRegex.test(email)) {
+                    emailError.style.display = 'block';
+                } else {
+                    emailError.style.display = 'none';
+                }
+            });
+
+            // Şifre validasyonu
+            passwordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+
+                if(password && password.length < 8) {
+                    passwordError.style.display = 'block';
+                } else {
+                    passwordError.style.display = 'none';
+                }
+            });
+
+            // Şifremi unuttum
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                const email = prompt("Şifre sıfırlama bağlantısı gönderilecek e-posta adresinizi girin:");
+
+                if(email) {
+                    // Burada şifre sıfırlama isteği gönderilecek
+                    alert(`Şifre sıfırlama bağlantısı ${email} adresine gönderildi.`);
+                    window.location.href = 'login.html?reset=true';
+                }
+            });
+
+            // Giriş formu gönderimi
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                const rememberMe = document.getElementById('remember').checked;
+
+                // Basit validasyon
+                let isValid = true;
+
+                if(!email) {
+                    emailError.textContent = 'E-posta adresi gereklidir';
+                    emailError.style.display = 'block';
+                    isValid = false;
+                }
+
+                if(!password) {
+                    passwordError.textContent = 'Şifre gereklidir';
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                } else if(password.length < 8) {
+                    passwordError.textContent = 'Şifre en az 8 karakter olmalıdır';
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                }
+
+                if(isValid) {
+                    // Burada gerçek giriş işlemi yapılacak
+                    console.log('Giriş bilgileri:', { email, password, rememberMe });
+
+                    // Giriş başarılı ise index.html'ye yönlendir
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

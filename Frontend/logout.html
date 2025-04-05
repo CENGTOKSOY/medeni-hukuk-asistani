@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çıkış Yap - MehuGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-darker: #0a0a0a;
+            --bg-panel: #1e1e1e;
+            --primary-text: #e0e0e0;
+            --secondary-text: #a0a0a0;
+            --accent-color: #3a3a3a;
+            --input-bg: #2d2d2d;
+            --border-color: #333;
+            --sidebar-width: 280px;
+            --primary-blue: #1a73e8;
+            --error-red: #ea4335;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--primary-text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sol Panel */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-darker);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: transform 0.3s ease;
+            position: fixed;
+            z-index: 100;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .new-chat-btn {
+            background-color: var(--accent-color);
+            color: var(--primary-text);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .new-chat-btn i {
+            margin-right: 5px;
+        }
+
+        .search-bar {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--primary-text);
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        /* Ana İçerik */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Çıkış Sayfası İçeriği */
+        .logout-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .logout-card {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .logout-icon {
+            font-size: 3rem;
+            color: var(--error-red);
+            margin-bottom: 20px;
+        }
+
+        .logout-message {
+            margin-bottom: 30px;
+        }
+
+        .logout-message h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--primary-text);
+        }
+
+        .logout-message p {
+            color: var(--secondary-text);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .logout-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .logout-btn {
+            background-color: var(--error-red);
+            color: var(--primary-text);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #c23321;
+        }
+
+        .cancel-btn {
+            background-color: var(--accent-color);
+            color: var(--primary-text);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background-color: #185abc;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logout-card {
+                padding: 30px 20px;
+            }
+
+            .logout-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .logout-btn, .cancel-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sol Panel -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" id="new-chat-btn">
+                <i class="fas fa-plus"></i>
+                <span>Yeni Sohbet</span>
+            </button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Sohbet ara...">
+        </div>
+
+        <div class="chat-history" id="chat-history">
+            <!-- Sohbet geçmişi buraya dinamik olarak eklenecek -->
+        </div>
+    </div>
+
+    <!-- Ana İçerik -->
+    <div class="main-content">
+        <div class="logout-container">
+            <div class="logout-card">
+                <div class="logout-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="logout-message">
+                    <h2>Oturumu Kapat</h2>
+                    <p>Hesabınızdan çıkış yapmak üzeresiniz. Çıkış yaparsanız, bazı özelliklere erişiminiz kısıtlanacaktır. Devam etmek istiyor musunuz?</p>
+                </div>
+                <div class="logout-actions">
+                    <button class="logout-btn" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Çıkış Yap
+                    </button>
+                    <button class="cancel-btn" id="cancel-btn">
+                        <i class="fas fa-times"></i>
+                        İptal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const newChatBtn = document.getElementById('new-chat-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+
+            // Yeni sohbet oluştur
+            function createNewChat() {
+                alert('Yeni sohbet oluşturulacak');
+            }
+
+            newChatBtn.addEventListener('click', createNewChat);
+
+            // Çıkış butonu
+            logoutBtn.addEventListener('click', function() {
+                // Burada gerçek çıkış işlemi yapılacak
+                // Örneğin: session temizleme, token silme vs.
+
+                // Çıkış başarılı olduktan sonra login sayfasına yönlendir
+                // logout parametresi ile login sayfasında mesaj gösterilebilir
+                window.location.href = 'login.html?logout=true';
+            });
+
+            // İptal butonu
+            cancelBtn.addEventListener('click', function() {
+                // Ana sayfaya geri dön
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>

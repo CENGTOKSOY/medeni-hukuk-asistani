@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - MehuGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-darker: #0a0a0a;
+            --bg-panel: #1e1e1e;
+            --primary-text: #e0e0e0;
+            --secondary-text: #a0a0a0;
+            --accent-color: #3a3a3a;
+            --input-bg: #2d2d2d;
+            --border-color: #333;
+            --user-message: #553d2f;
+            --bot-message: #2d2d2d;
+            --sidebar-width: 280px;
+            --primary-blue: #1a73e8;
+            --success-green: #34a853;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--primary-text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Kayıt Sayfası Özel Stiller */
+        .signup-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .signup-left {
+            flex: 1;
+            background-color: var(--bg-darker);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .signup-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .signup-card {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .signup-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .signup-logo i {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+
+        .signup-logo h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .signup-logo p {
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+        }
+
+        .signup-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .signup-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+
+        .signup-form input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--primary-text);
+            font-size: 1rem;
+        }
+
+        .signup-form input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            height: 4px;
+            background-color: var(--input-bg);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #ff0000;
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        .terms-conditions {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+
+        .terms-conditions input {
+            width: auto;
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+
+        .terms-conditions a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--success-green);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .signup-btn:hover {
+            background-color: #2d9249;
+        }
+
+        .social-signup {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .social-signup p {
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .social-signup p::before,
+        .social-signup p::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background-color: var(--border-color);
+        }
+
+        .social-signup p::before {
+            left: 0;
+        }
+
+        .social-signup p::after {
+            right: 0;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--input-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .social-icon:hover {
+            background-color: var(--accent-color);
+        }
+
+        .login-link {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+
+        .login-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (min-width: 992px) {
+            .signup-left {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .signup-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <!-- Sol Tarafta Tanıtım Alanı (Büyük ekranlarda gözükecek) -->
+        <div class="signup-left">
+            <div style="max-width: 400px;">
+                <i class="fas fa-balance-scale" style="font-size: 4rem; color: var(--primary-blue); margin-bottom: 20px;"></i>
+                <h2 style="font-size: 2rem; margin-bottom: 15px;">MeHuGPT'ye Katılın</h2>
+                <p style="color: var(--secondary-text); line-height: 1.6; margin-bottom: 30px;">
+                    Medeni Hukuk asistanınızla tanışın. Üye olarak aşağıdaki avantajlardan yararlanabilirsiniz:
+                </p>
+                <ul style="color: var(--secondary-text); list-style-type: none;">
+                    <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                        <i class="fas fa-check-circle" style="color: var(--success-green); margin-right: 10px; margin-top: 3px;"></i>
+                        <span>Sınırsız hukuki soru sorma hakkı</span>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                        <i class="fas fa-check-circle" style="color: var(--success-green); margin-right: 10px; margin-top: 3px;"></i>
+                        <span>Kişiselleştirilmiş hukuki analizler</span>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                        <i class="fas fa-check-circle" style="color: var(--success-green); margin-right: 10px; margin-top: 3px;"></i>
+                        <span>Güncel Yargıtay kararlarına erişim</span>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                        <i class="fas fa-check-circle" style="color: var(--success-green); margin-right: 10px; margin-top: 3px;"></i>
+                        <span>Özel dosya saklama alanı</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Sağ Tarafta Kayıt Formu -->
+        <div class="signup-right">
+            <div class="signup-card">
+                <div class="signup-logo">
+                    <i class="fas fa-balance-scale"></i>
+                    <h1>Hesap Oluştur</h1>
+                    <p>MeHuGPT'nin avantajlarından yararlanmaya başlayın</p>
+                </div>
+
+                <form class="signup-form" id="signupForm">
+                    <div class="form-group">
+                        <label for="fullname">Tam Adınız</label>
+                        <input type="text" id="fullname" name="fullname" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-posta Adresi</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Şifre</label>
+                        <input type="password" id="password" name="password" required>
+                        <div class="password-strength">
+                            <div class="strength-bar" id="strengthBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm-password">Şifreyi Onayla</label>
+                        <input type="password" id="confirm-password" name="confirm-password" required>
+                    </div>
+
+                    <div class="terms-conditions">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">
+                            <a href="conditions.html">Kullanım koşullarını</a> ve <a href="privacypolicy.html">gizlilik politikasını</a> okudum ve kabul ediyorum.
+                        </label>
+                    </div>
+
+                    <button type="submit" class="signup-btn">Kayıt Ol</button>
+
+                    <div class="social-signup">
+                        <p>Veya şununla kayıt olun</p>
+                        <div class="social-icons">
+                            <div class="social-icon">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="social-icon">
+                                <i class="fab fa-microsoft"></i>
+                            </div>
+                            <div class="social-icon">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="login-link">
+                        Zaten bir hesabınız var mı? <a href="login.html">Giriş Yapın</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const signupForm = document.getElementById('signupForm');
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.getElementById('strengthBar');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+
+            // Şifre güç göstergesi
+            passwordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                let strength = 0;
+
+                if (password.length > 0) strength += 20;
+                if (password.length >= 8) strength += 20;
+                if (/[A-Z]/.test(password)) strength += 20;
+                if (/[0-9]/.test(password)) strength += 20;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+
+                strengthBar.style.width = strength + '%';
+
+                if (strength < 40) {
+                    strengthBar.style.backgroundColor = '#ff0000';
+                } else if (strength < 80) {
+                    strengthBar.style.backgroundColor = '#ff9900';
+                } else {
+                    strengthBar.style.backgroundColor = '#00ff00';
+                }
+            });
+
+            // Şifre onay kontrolü
+            confirmPasswordInput.addEventListener('input', function() {
+                if (confirmPasswordInput.value !== passwordInput.value) {
+                    confirmPasswordInput.setCustomValidity('Şifreler eşleşmiyor');
+                } else {
+                    confirmPasswordInput.setCustomValidity('');
+                }
+            });
+
+            // Kayıt formu gönderimi
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Burada gerçek kayıt işlemi yapılacak
+                const fullname = document.getElementById('fullname').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                // Basit bir kontrol (gerçek uygulamada sunucu tarafında kontrol yapılmalı)
+                if(fullname && email && password) {
+                    // Kayıt başarılı ise login sayfasına yönlendir
+                    alert('Kayıt başarılı! Giriş yapabilirsiniz.');
+                    window.location.href = 'login.html?registered=true';
+                } else {
+                    alert('Lütfen tüm alanları doldurunuz.');
+                }
+            });
+
+            // Eğer URL'de registered parametresi varsa (başka bir sayfadan yönlendirilmişse)
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.has('registered')) {
+                alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+            }
+        });
+    </script>
+</body>
+</html>
