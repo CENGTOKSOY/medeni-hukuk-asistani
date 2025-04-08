@@ -9,8 +9,8 @@ load_dotenv()
 
 class VectorRepository:
     def __init__(self):
-        pinecone_api_key = os.getenv("PINECONE_API_KEY")
-        pinecone_env = os.getenv("PINECONE_ENVIRONMENT")
+        pinecone_api_key = os.getenv("pcsk_6nfeYW_BfsQMdyByy43Ck42jwBtyeFZnoWseXR1cnQQfJqRaAbWBh8gbwhvw4SofP1LV1t")
+        pinecone_env = os.getenv("medeni-hukuk-tr")
 
         if not pinecone_api_key or not pinecone_env:
             raise ValueError("Pinecone credentials not configured")

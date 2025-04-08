@@ -5,7 +5,7 @@ from models.chat_model import Chat, Message
 
 class ChatRepository:
     def __init__(self):
-        self.client = MongoClient("mongodb_uri")
+        self.client = MongoClient("mongodb+srv://gaffartoksoy:<db_password>@medeni-hukuk-tr.yy7hqk0.mongodb.net/?retryWrites=true&w=majority&appName=medeni-hukuk-tr")
         self.db = self.client["medeni_hukuk_db"]
         self.chats = self.db["chats"]
 

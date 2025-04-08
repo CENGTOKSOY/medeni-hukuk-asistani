@@ -346,68 +346,50 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const signupForm = document.getElementById('signupForm');
-            const passwordInput = document.getElementById('password');
-            const strengthBar = document.getElementById('strengthBar');
-            const confirmPasswordInput = document.getElementById('confirm-password');
+document.addEventListener('DOMContentLoaded', function() {
+    const signupForm = document.getElementById('signupForm');
 
-            // Şifre güç göstergesi
-            passwordInput.addEventListener('input', function() {
-                const password = passwordInput.value;
-                let strength = 0;
+    signupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-                if (password.length > 0) strength += 20;
-                if (password.length >= 8) strength += 20;
-                if (/[A-Z]/.test(password)) strength += 20;
-                if (/[0-9]/.test(password)) strength += 20;
-                if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+        const fullname = document.getElementById('fullname').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
 
-                strengthBar.style.width = strength + '%';
+        if (password !== confirmPassword) {
+            alert('Şifreler eşleşmiyor!');
+            return;
+        }
 
-                if (strength < 40) {
-                    strengthBar.style.backgroundColor = '#ff0000';
-                } else if (strength < 80) {
-                    strengthBar.style.backgroundColor = '#ff9900';
-                } else {
-                    strengthBar.style.backgroundColor = '#00ff00';
-                }
+        try {
+            const response = await fetch('http://localhost:8000/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: email,
+                    email: email,
+                    password: password,
+                    fullname: fullname
+                })
             });
 
-            // Şifre onay kontrolü
-            confirmPasswordInput.addEventListener('input', function() {
-                if (confirmPasswordInput.value !== passwordInput.value) {
-                    confirmPasswordInput.setCustomValidity('Şifreler eşleşmiyor');
-                } else {
-                    confirmPasswordInput.setCustomValidity('');
-                }
-            });
+            const data = await response.json();
 
-            // Kayıt formu gönderimi
-            signupForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                // Burada gerçek kayıt işlemi yapılacak
-                const fullname = document.getElementById('fullname').value;
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-
-                // Basit bir kontrol (gerçek uygulamada sunucu tarafında kontrol yapılmalı)
-                if(fullname && email && password) {
-                    // Kayıt başarılı ise login sayfasına yönlendir
-                    alert('Kayıt başarılı! Giriş yapabilirsiniz.');
-                    window.location.href = 'login.html?registered=true';
-                } else {
-                    alert('Lütfen tüm alanları doldurunuz.');
-                }
-            });
-
-            // Eğer URL'de registered parametresi varsa (başka bir sayfadan yönlendirilmişse)
-            const urlParams = new URLSearchParams(window.location.search);
-            if(urlParams.has('registered')) {
-                alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+            if (!response.ok) {
+                throw new Error(data.detail || 'Kayıt başarısız');
             }
-        });
+
+            alert('Kayıt başarılı! Giriş yapabilirsiniz.');
+            window.location.href = 'login.html?registered=true';
+        } catch (error) {
+            console.error('Kayıt hatası:', error);
+            alert('Kayıt sırasında bir hata oluştu: ' + error.message);
+        }
+    });
+});
     </script>
 </body>
 </html>

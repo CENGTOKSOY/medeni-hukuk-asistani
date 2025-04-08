@@ -418,106 +418,52 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.getElementById('loginForm');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            const emailError = document.getElementById('emailError');
-            const passwordError = document.getElementById('passwordError');
-            const successMessage = document.getElementById('successMessage');
-            const forgotPasswordLink = document.getElementById('forgotPassword');
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
 
-            // URL'den gelen parametreleri kontrol et
-            const urlParams = new URLSearchParams(window.location.search);
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-            // Kayıt sonrası mesajı göster
-            if(urlParams.has('registered')) {
-                successMessage.style.display = 'block';
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('remember').checked;
+
+        try {
+            const response = await fetch('http://localhost:8000/auth/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Giriş başarısız');
             }
 
-            // Çıkış sonrası mesajı göster
-            if(urlParams.has('logout')) {
-                successMessage.textContent = 'Başarıyla çıkış yaptınız. Tekrar giriş yapabilirsiniz.';
-                successMessage.style.display = 'block';
+            // JWT token'ı localStorage'a kaydet
+            localStorage.setItem('authToken', data.access_token);
+            if (rememberMe) {
+                localStorage.setItem('userEmail', email);
             }
 
-            // Şifre sıfırlama isteği sonrası mesaj
-            if(urlParams.has('reset')) {
-                successMessage.textContent = 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.';
-                successMessage.style.display = 'block';
-            }
+            // Ana sayfaya yönlendir
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Giriş hatası:', error);
+            document.getElementById('passwordError').textContent = 'Kullanıcı adı veya şifre hatalı';
+            document.getElementById('passwordError').style.display = 'block';
+        }
+    });
 
-            // E-posta validasyonu
-            emailInput.addEventListener('input', function() {
-                const email = emailInput.value;
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-                if(email && !emailRegex.test(email)) {
-                    emailError.style.display = 'block';
-                } else {
-                    emailError.style.display = 'none';
-                }
-            });
-
-            // Şifre validasyonu
-            passwordInput.addEventListener('input', function() {
-                const password = passwordInput.value;
-
-                if(password && password.length < 8) {
-                    passwordError.style.display = 'block';
-                } else {
-                    passwordError.style.display = 'none';
-                }
-            });
-
-            // Şifremi unuttum
-            forgotPasswordLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                const email = prompt("Şifre sıfırlama bağlantısı gönderilecek e-posta adresinizi girin:");
-
-                if(email) {
-                    // Burada şifre sıfırlama isteği gönderilecek
-                    alert(`Şifre sıfırlama bağlantısı ${email} adresine gönderildi.`);
-                    window.location.href = 'login.html?reset=true';
-                }
-            });
-
-            // Giriş formu gönderimi
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const email = emailInput.value;
-                const password = passwordInput.value;
-                const rememberMe = document.getElementById('remember').checked;
-
-                // Basit validasyon
-                let isValid = true;
-
-                if(!email) {
-                    emailError.textContent = 'E-posta adresi gereklidir';
-                    emailError.style.display = 'block';
-                    isValid = false;
-                }
-
-                if(!password) {
-                    passwordError.textContent = 'Şifre gereklidir';
-                    passwordError.style.display = 'block';
-                    isValid = false;
-                } else if(password.length < 8) {
-                    passwordError.textContent = 'Şifre en az 8 karakter olmalıdır';
-                    passwordError.style.display = 'block';
-                    isValid = false;
-                }
-
-                if(isValid) {
-                    // Burada gerçek giriş işlemi yapılacak
-                    console.log('Giriş bilgileri:', { email, password, rememberMe });
-
-                    // Giriş başarılı ise index.html'ye yönlendir
-                    window.location.href = 'index.html';
-                }
-            });
-        });
+    // Remember me kontrolü
+    if (localStorage.getItem('userEmail')) {
+        document.getElementById('email').value = localStorage.getItem('userEmail');
+        document.getElementById('remember').checked = true;
+    }
+});
     </script>
 </body>
 </html>

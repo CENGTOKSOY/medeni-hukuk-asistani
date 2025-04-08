@@ -1,24 +1,46 @@
 from fastapi import FastAPI, Depends
-from services.chat_service import ChatService
-from services.rag_service import RAGService
-from models.chat_model import ChatRequest, QuestionRequest
+from fastapi.middleware.cors import CORSMiddleware
+from pymongo import MongoClient
+from config import settings
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
 
-app = FastAPI()
+app = FastAPI(title="Medeni Hukuk Asistanı API")
 
-# Dependency Injection
-def get_chat_service():
-    return ChatService()
+# CORS Ayarları
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-def get_rag_service():
-    return RAGService()
+# MongoDB Bağlantısı (Direkt bağlantı)
+mongo_client = MongoClient(settings.MONGO_URI)
+db = mongo_client[settings.MONGO_DB]
 
-@app.post("/api/chats")
-async def create_chat(service: ChatService = Depends(get_chat_service)):
-    return await service.create_chat()
+# Dependency
+def get_db():
+    return db
 
-@app.post("/api/ask")
-async def ask_question(
-    request: QuestionRequest,
-    rag: RAGService = Depends(get_rag_service)
-):
-    return await rag.generate_response(request.question, request.chat_id)
+@app.on_event("startup")
+async def startup_event():
+    # Pinecone başlatma
+    import pinecone
+    pinecone.init(
+        api_key=settings.PINECONE_API_KEY,
+        environment=settings.PINECONE_ENV
+    )
+
+@app.get("/")
+async def root():
+    return {"status": "API aktif", "database": "MongoDB bağlantısı başarılı"}
+
+# Routeları ekle
+from services.auth_service import router as auth_router
+from services.chat_service import router as chat_router
+
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
+app.include_router(chat_router, prefix="/chat", tags=["chat"])
