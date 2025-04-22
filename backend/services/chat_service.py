@@ -1,44 +1,76 @@
-from fastapi import APIRouter, HTTPException
-from models.chat_model import ChatRequest, ChatResponse
+from typing import List, Optional
+from fastapi import HTTPException
+from ..models.chat_model import ChatSession, Message, MessageRole
+from ..repositories.vector_repo import VectorRepository
+from ..utils.file_processor import process_document
 import openai
-import pinecone
-from config import settings
+import os
+from dotenv import load_dotenv
 
-router = APIRouter()
+load_dotenv()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-# Pinecone ve OpenAI zaten startup'ta başlatıldı
+class ChatService:
+    def __init__(self):
+        self.vector_repo = VectorRepository()
 
-@router.post("/ask", response_model=ChatResponse)
-async def ask_question(request: ChatRequest):
-    try:
-        # Embedding oluştur
-        embedding = openai.Embedding.create(
-            input=request.question,
-            model="text-embedding-ada-002",
-            api_key=settings.OPENAI_API_KEY
-        )["data"][0]["embedding"]
+    async def generate_response(self, user_id: str, session_id: str, question: str) -> str:
+        try:
+            # Step 1: Get relevant context from vector DB
+            embedding = self._get_embedding(question)
+            query_result = await self.vector_repo.query_vectors(embedding)
 
-        # Pinecone sorgusu
-        index = pinecone.Index(settings.PINECONE_INDEX_NAME)
-        results = index.query(vector=embedding, top_k=3, include_metadata=True)
+            # Step 2: Build context from retrieved documents
+            context = self._build_context(query_result.matches)
 
-        # Context hazırla
-        context = "\n".join([match.metadata["text"] for match in results.matches])
+            # Step 3: Generate response using LLM
+            response = await self._call_llm(user_id, session_id, question, context)
 
-        # GPT-4 ile cevap oluştur
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    def _get_embedding(self, text: str) -> List[float]:
+        response = openai.Embedding.create(
+            input=text,
+            model="text-embedding-ada-002"
+        )
+        return response['data'][0]['embedding']
+
+    def _build_context(self, matches: List[dict]) -> str:
+        context = ""
+        for match in matches:
+            context += f"Document excerpt: {match['metadata']['text']}\n"
+            context += f"Source: {match['metadata']['source']}\n\n"
+        return context
+
+    async def _call_llm(self, user_id: str, session_id: str, question: str, context: str) -> str:
+        prompt = f"""
+        You are a legal assistant specialized in Turkish Civil Law. Answer the question based on the context below.
+        Provide detailed, accurate information with references to relevant laws when possible.
+
+        Context:
+        {context}
+
+        Question: {question}
+        """
+
         response = openai.ChatCompletion.create(
-            api_key=settings.OPENAI_API_KEY,
             model="gpt-4",
             messages=[
-                {"role": "system",
-                 "content": "Sen Türk Medeni Kanunu uzmanısın. Sadece verilen bağlama dayanarak cevap ver."},
-                {"role": "user", "content": f"Bağlam:\n{context}\n\nSoru: {request.question}"}
+                {"role": "system", "content": "You are a helpful legal assistant."},
+                {"role": "user", "content": prompt}
             ],
             temperature=0.3
         )
 
-        return {"answer": response.choices[0].message.content}
+        return response.choices[0].message['content']
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    async def create_chat_session(self, user_id: str, title: Optional[str] = None) -> ChatSession:
+        return ChatSession(
+            user_id=user_id,
+            session_id=str(uuid.uuid4()),
+            title=title or "New Chat"
+        )

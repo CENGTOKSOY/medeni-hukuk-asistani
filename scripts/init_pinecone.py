@@ -6,15 +6,15 @@ load_dotenv()
 
 
 def initialize_pinecone():
-    pinecone_api_key = os.getenv("pcsk_6nfeYW_BfsQMdyByy43Ck42jwBtyeFZnoWseXR1cnQQfJqRaAbWBh8gbwhvw4SofP1LV1t")
-    pinecone_env = os.getenv("medeni-hukuk-tr")
+    pinecone_api_key = os.getenv("PINECONE_API_KEY")
+    pinecone_env = os.getenv("PINECONE_ENVIRONMENT")
 
     if not pinecone_api_key or not pinecone_env:
         raise ValueError("Pinecone credentials not found in environment variables")
 
     pinecone.init(api_key=pinecone_api_key, environment=pinecone_env)
 
-    index_name = "medeni-hukuk-tr"
+    index_name = "medeni-hukuk"
 
     if index_name not in pinecone.list_indexes():
         print(f"Creating index {index_name}...")

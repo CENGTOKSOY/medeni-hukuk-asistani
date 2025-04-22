@@ -1,20 +1,22 @@
-class Settings:
-    # MongoDB Ayarları
-    MONGO_URI = "mongodb+srv://gaffartoksoy:1fB2Bkn7zTUSPWj1@medeni-hukuk-tr.yy7hqk0.mongodb.net/?retryWrites=true&w=majority&appName=medeni-hukuk-tr"
-    MONGO_DB = "medeni_hukuk"
+# backend/config.py
+from dotenv import load_dotenv
+import os
 
-    # Pinecone Ayarları
-    PINECONE_API_KEY = "pcsk_6nfeYW_BfsQMdyByy43Ck42jwBtyeFZnoWseXR1cnQQfJqRaAbWBh8gbwhvw4SofP1LV1t"
-    PINECONE_ENV = "medeni-hukuk-tr"
-    PINECONE_INDEX_NAME = "medeni-hukuk-tr"
+load_dotenv()
+
+
+class Config:
+    # MongoDB
+    MONGO_URI = os.getenv("MONGO_URI")
+    MONGO_DB = os.getenv("MONGO_DB")
+
+    # Pinecone
+    PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+    PINECONE_INDEX = os.getenv("PINECONE_INDEX_NAME")
 
     # OpenAI
-    OPENAI_API_KEY = "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"
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
     # JWT
-    SECRET_KEY = "9a8f7e6d5c4b3a29182736455463728192"
-    ALGORITHM = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
-settings = Settings()
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    ALGORITHM = os.getenv("ALGORITHM", "HS256")

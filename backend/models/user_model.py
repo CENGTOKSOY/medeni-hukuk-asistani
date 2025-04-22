@@ -1,17 +1,22 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from datetime import datetime
 
 class UserBase(BaseModel):
-    username: str
     email: EmailStr
+    full_name: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str
-    fullname: str
 
 class UserInDB(UserBase):
+    id: str
     hashed_password: str
-    disabled: bool = False
-    fullname: Optional[str] = None
-    created_at: Optional[datetime] = None
+    is_active: bool = True
+    is_superuser: bool = False
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: Optional[str] = None

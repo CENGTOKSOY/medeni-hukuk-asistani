@@ -15,7 +15,7 @@
             --accent-color: #3a3a3a;
             --input-bg: #2d2d2d;
             --border-color: #333;
-            --user-message: #0a0e35;
+            --user-message: #08253f;
             --bot-message: #2d2d2d;
             --sidebar-width: 280px;
             --primary-blue: #1a73e8;
@@ -444,7 +444,7 @@
             </div>
             <div class="profile-dropdown">
                 <div class="profile">
-                    <span>My Profile</span>
+                    <span>Ali Gaffar Toksoy</span>
                     <i class="fas fa-user-circle"></i>
                 </div>
                 <div class="dropdown-content">
@@ -483,9 +483,9 @@
         </div>
     </div>
 
- <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Önceki DOM seçicileri ve değişkenler aynı
+            // DOM Elementleri
             const sidebar = document.querySelector('.sidebar');
             const toggleSidebarMain = document.getElementById('toggle-sidebar-main');
             const newChatBtn = document.getElementById('new-chat-btn');
@@ -498,62 +498,14 @@
             const voiceBtn = document.getElementById('voice-btn');
             const homeButton = document.getElementById('home-button');
 
-            // JWT Token yönetimi için değişken
-            let authToken = localStorage.getItem('authToken');
-
-            // API Base URL
-            const API_BASE_URL = window.location.hostname === 'localhost'
-                ? 'http://localhost:8000'
-                : 'https://api.medenihukukasistani.com';
-
-            // Kullanıcı oturum kontrolü
-            function checkAuth() {
-                if (!authToken) {
-                    window.location.href = 'login.html';
-                }
-            }
-
-            // API istekleri için yardımcı fonksiyon
-            async function makeApiRequest(endpoint, method = 'GET', body = null) {
-                const headers = {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
-                };
-
-                const options = {
-                    method,
-                    headers,
-                    body: body ? JSON.stringify(body) : null
-                };
-
-                try {
-                    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-
-                    if (response.status === 401) {
-                        // Yetkisiz erişim
-                        localStorage.removeItem('authToken');
-                        window.location.href = 'login.html';
-                        return;
-                    }
-
-                    if (!response.ok) {
-                        throw new Error(`API hatası: ${response.status}`);
-                    }
-
-                    return await response.json();
-                } catch (error) {
-                    console.error('API isteği başarısız:', error);
-                    throw error;
-                }
-            }
-
-            // Sayfa yüklendiğinde oturum kontrolü yap
-            checkAuth();
-
             // Ana sayfa butonu
             homeButton.addEventListener('click', function() {
                 window.location.href = 'index.html';
             });
+
+            // Sohbet geçmişi ve aktif sohbet
+            let chats = [];
+            let activeChatId = null;
 
             // Panel aç/kapa
             function toggleSidebarFunc() {
@@ -573,7 +525,7 @@
                     createdAt: new Date()
                 };
 
-                chats.unshift(chat);
+                chats.unshift(chat); // En üste ekle
                 activeChatId = chatId;
                 renderChatHistory();
                 switchToChat(chatId);
@@ -697,35 +649,32 @@
                 }
             }
 
-            // Backend'e soru gönder ve yanıt al
-            async function getBotResponse(userMessage) {
-                try {
-                    const response = await makeApiRequest('/chat/ask', 'POST', {
-                        question: userMessage
-                    });
+            // Bot yanıtı simüle et
+            function simulateBotResponse(userMessage) {
+                const responses = [
+                    "Medeni Kanun'un 23. maddesine göre, bu durumda...",
+                    "Yargıtay'ın 2023/4567 sayılı kararında benzer bir durumda...",
+                    "Sorduğunuz konu Türk Medeni Kanunu'nun 145-156. maddeleri kapsamında düzenlenmiştir.",
+                    "Bu konuda Yargıtay'ın yerleşik bir içtihadı bulunmaktadır...",
+                    "Medeni hukukta bu durum '${userMessage.split(' ')[0]}' kavramıyla ilişkilendirilir..."
+                ];
 
-                    return response.answer;
-                } catch (error) {
-                    console.error('API hatası:', error);
-                    return "Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
-                }
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+                setTimeout(() => {
+                    addMessage(randomResponse, false);
+                }, 1000);
             }
 
             // Mesaj gönder
-            async function sendMessage() {
+            function sendMessage() {
                 const message = userInput.value.trim();
                 if (message === '') return;
 
                 addMessage(message, true);
                 userInput.value = '';
-                userInput.style.height = 'auto';
 
-                try {
-                    const botResponse = await getBotResponse(message);
-                    addMessage(botResponse, false);
-                } catch (error) {
-                    addMessage("Yanıt alınırken bir hata oluştu. Lütfen tekrar deneyin.", false);
-                }
+                simulateBotResponse(message);
             }
 
             // Event listeners
@@ -739,7 +688,7 @@
             sendBtn.addEventListener('click', sendMessage);
 
             voiceBtn.addEventListener('click', function() {
-                alert('Sesli giriş özelliği yakında eklenecek');
+                alert('Sesli giriş özelliği aktif edilecek');
             });
 
             userInput.addEventListener('input', function() {
@@ -747,22 +696,8 @@
                 this.style.height = (this.scrollHeight) + 'px';
             });
 
-            // Sayfa yüklendiğinde kullanıcı bilgilerini çek
-            async function loadUserProfile() {
-                try {
-                    const userData = await makeApiRequest('/auth/me');
-                    document.querySelector('.profile span').textContent = userData.username;
-                } catch (error) {
-                    console.error('Kullanıcı bilgileri yüklenemedi:', error);
-                }
-            }
-
-            // Başlangıçta welcome ekranını göster ve kullanıcı bilgilerini yükle
+            // Başlangıçta welcome ekranını göster
             welcomeContainer.style.display = 'flex';
-            loadUserProfile();
-
-            // Sayfa yüklendiğinde bir sohbet oluştur
-            createNewChat();
         });
     </script>
 </body>
