@@ -25,3 +25,14 @@ class ChatSession(BaseModel):
     def add_message(self, message: Message):
         self.messages.append(message)
         self.updated_at = datetime.now()
+        # models/chat_model.py
+
+class QuestionRequest(BaseModel):
+    question: str
+    chat_id: str
+
+class ChatRequest(BaseModel):
+    user_id: Optional[str] = None  # varsa kullan, yoksa frontend göndermezse sorun çıkmaz
+class RAGResponse(BaseModel):
+    answer: str
+    references: List[str]

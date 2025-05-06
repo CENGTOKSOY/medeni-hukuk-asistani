@@ -1,25 +1,24 @@
 from typing import List, Optional
 from fastapi import HTTPException
-from ..models.chat_model import ChatSession, Message, MessageRole
-from ..repositories.vector_repo import VectorRepository
-from ..utils.file_processor import process_document
-import openai
+from backend.models.chat_model import ChatSession, Message, MessageRole
+from backend.repositories.vector_repo import VectorRepository
+from backend.utils.file_processor import process_document
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import uuid
 
 load_dotenv()
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
 
 class ChatService:
     def __init__(self):
         self.vector_repo = VectorRepository()
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  # OpenAI nesnesi
 
     async def generate_response(self, user_id: str, session_id: str, question: str) -> str:
         try:
             # Step 1: Get relevant context from vector DB
-            embedding = self._get_embedding(question)
+            embedding = await self._get_embedding(question)
             query_result = await self.vector_repo.query_vectors(embedding)
 
             # Step 2: Build context from retrieved documents
@@ -32,12 +31,12 @@ class ChatService:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    def _get_embedding(self, text: str) -> List[float]:
-        response = openai.Embedding.create(
-            input=text,
-            model="text-embedding-ada-002"
+    async def _get_embedding(self, text: str) -> List[float]:
+        response = self.client.embeddings.create(
+            model="text-embedding-3-large",
+            input=text
         )
-        return response['data'][0]['embedding']
+        return response.data[0].embedding
 
     def _build_context(self, matches: List[dict]) -> str:
         context = ""
@@ -57,8 +56,8 @@ class ChatService:
         Question: {question}
         """
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = self.client.chat.completions.create(
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful legal assistant."},
                 {"role": "user", "content": prompt}
@@ -66,7 +65,7 @@ class ChatService:
             temperature=0.3
         )
 
-        return response.choices[0].message['content']
+        return response.choices[0].message.content
 
     async def create_chat_session(self, user_id: str, title: Optional[str] = None) -> ChatSession:
         return ChatSession(

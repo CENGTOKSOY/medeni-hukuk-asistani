@@ -1,11 +1,13 @@
 from pymongo import MongoClient
 from datetime import datetime
 from models.chat_model import Chat, Message
+import os
 
 
 class ChatRepository:
     def __init__(self):
-        self.client = MongoClient("mongodb_uri")
+        #self.client = MongoClient("mongodb_uri")
+        self.client = MongoClient(os.getenv("MONGODB_URI"))
         self.db = self.client["medeni_hukuk_db"]
         self.chats = self.db["chats"]
 

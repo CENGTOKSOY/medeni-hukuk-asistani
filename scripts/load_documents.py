@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from backend.utils.file_processor import process_document
 from backend.repositories.vector_repo import VectorRepository
 from tqdm import tqdm
+import uuid
 
 load_dotenv()
 

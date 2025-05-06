@@ -1,9 +1,8 @@
-import pinecone
 import os
+from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
 
 load_dotenv()
-
 
 def initialize_pinecone():
     pinecone_api_key = os.getenv("PINECONE_API_KEY")
@@ -12,24 +11,27 @@ def initialize_pinecone():
     if not pinecone_api_key or not pinecone_env:
         raise ValueError("Pinecone credentials not found in environment variables")
 
-    pinecone.init(api_key=pinecone_api_key, environment=pinecone_env)
+    pc = Pinecone(api_key=pinecone_api_key)
 
-    index_name = "medeni-hukuk"
+    index_name = "medeni-hukuk-danisman"
 
-    if index_name not in pinecone.list_indexes():
+    # İndeks mevcut değilse oluştur
+    if index_name not in pc.list_indexes().names():
         print(f"Creating index {index_name}...")
-        pinecone.create_index(
+        pc.create_index(
             name=index_name,
-            dimension=1536,  # OpenAI embedding dimension
+            dimension=3072,  # 'text-embedding-3-large'dimension
             metric="cosine",
-            pod_type="p1"
+            spec=ServerlessSpec(
+                cloud="aws",
+                region=pinecone_env
+            )
         )
         print("Index created successfully!")
     else:
         print(f"Index {index_name} already exists")
 
-    print("Current indexes:", pinecone.list_indexes())
-
+    print("Current indexes:", pc.list_indexes().names())
 
 if __name__ == "__main__":
     initialize_pinecone()

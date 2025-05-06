@@ -19,6 +19,7 @@
             --bot-message: #2d2d2d;
             --sidebar-width: 280px;
             --primary-blue: #1a73e8;
+            --hover-blue: #2a83f8;
         }
 
         * {
@@ -65,16 +66,22 @@
             background-color: var(--accent-color);
             color: var(--primary-text);
             border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
+            padding: 10px 15px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.9rem;
             display: flex;
             align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .new-chat-btn:hover {
+            background-color: #4a4a4a;
+            transform: translateY(-1px);
         }
 
         .new-chat-btn i {
-            margin-right: 5px;
+            margin-right: 8px;
         }
 
         .search-bar {
@@ -84,11 +91,17 @@
 
         .search-bar input {
             width: 100%;
-            padding: 8px 12px;
+            padding: 10px 15px;
             background-color: var(--bg-panel);
             border: 1px solid var(--border-color);
-            border-radius: 5px;
+            border-radius: 8px;
             color: var(--primary-text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary-blue);
         }
 
         .chat-history {
@@ -100,11 +113,13 @@
         .chat-item {
             padding: 12px 15px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-left: 3px solid transparent;
+            margin: 2px 5px;
+            border-radius: 5px;
         }
 
         .chat-item:hover {
@@ -113,7 +128,7 @@
 
         .chat-item.active {
             background-color: var(--accent-color);
-            border-left: 3px solid var(--primary-text);
+            border-left: 3px solid var(--primary-blue);
         }
 
         .chat-item i {
@@ -125,16 +140,41 @@
             color: var(--secondary-text);
             padding: 5px;
             display: none;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .delete-chat:hover {
+            color: #ff4d4d;
         }
 
         .chat-item:hover .delete-chat {
             display: block;
         }
 
-        /* Profile Dropdown */
+        /* Profil Dropdown */
         .profile-dropdown {
             position: relative;
             display: inline-block;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .profile:hover {
+            background-color: var(--accent-color);
+        }
+
+        .profile i {
+            margin-left: 8px;
+            font-size: 1.4rem;
+            color: var(--primary-blue);
         }
 
         .dropdown-content {
@@ -142,11 +182,12 @@
             position: absolute;
             right: 0;
             background-color: var(--bg-panel);
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            min-width: 180px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             z-index: 1;
-            border-radius: 5px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
+            overflow: hidden;
         }
 
         .dropdown-content a {
@@ -155,17 +196,24 @@
             text-decoration: none;
             display: block;
             font-size: 0.9rem;
+            transition: background-color 0.2s;
         }
 
         .dropdown-content a:hover {
             background-color: var(--accent-color);
         }
 
+        .dropdown-content a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
         .profile-dropdown:hover .dropdown-content {
             display: block;
         }
 
-        /* Ana İçerik */
+        /* Ana Ä°Ã§erik */
         .main-content {
             flex: 1;
             display: flex;
@@ -182,17 +230,18 @@
         }
 
         .top-bar {
-            padding: 15px 20px;
+            padding: 15px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-darker);
         }
 
         .top-bar-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
         .toggle-sidebar-main {
@@ -201,11 +250,14 @@
             color: var(--secondary-text);
             cursor: pointer;
             font-size: 1.2rem;
-            transition: transform 0.3s ease;
+            transition: all 0.2s;
+            padding: 8px;
+            border-radius: 50%;
         }
 
-        .sidebar.collapsed ~ .main-content .toggle-sidebar-main {
-            transform: rotate(90deg);
+        .toggle-sidebar-main:hover {
+            background-color: var(--accent-color);
+            color: var(--primary-text);
         }
 
         .app-title-button {
@@ -218,22 +270,22 @@
         }
 
         .app-title {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: var(--primary-text);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             transition: opacity 0.2s;
         }
 
         .app-title:hover {
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         .app-logo {
-            font-size: 1.2rem;
-            color: #85898c;
+            font-size: 1.3rem;
+            color: var(--primary-blue);
             transition: transform 0.3s;
         }
 
@@ -241,132 +293,137 @@
             transform: rotate(15deg);
         }
 
-        .profile {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .profile i {
-            margin-left: 8px;
-            color: var(--secondary-text);
-            font-size: 1.4rem;
-        }
-
         /* Chat Container */
         .chat-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
         }
 
         .welcome-container {
-            display: flex !important;
+            display: flex;
             margin: auto;
             text-align: center;
-            padding: 40px 20px;
-            max-width: 600px;
+            padding: 50px 30px;
+            max-width: 700px;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 100%;
-        }
-
-        .sidebar.collapsed ~ .main-content .welcome-container {
-            max-width: 800px;
+            animation: fadeIn 0.5s ease;
         }
 
         .chat-title {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             color: var(--primary-text);
+            background: linear-gradient(90deg, var(--primary-blue), #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .welcome-message {
             background-color: var(--input-bg);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 25px;
             margin-bottom: 30px;
             border: 1px solid var(--border-color);
+            line-height: 1.7;
+            font-size: 1.1rem;
+            max-width: 600px;
         }
 
         .message-container {
-            max-width: 800px;
+            max-width: 850px;
             width: 100%;
             margin: 0 auto;
             display: none;
         }
 
-        .sidebar.collapsed ~ .main-content .message-container {
-            max-width: 1000px;
+        .message {
+            padding: 18px 22px;
+            margin-bottom: 22px;
+            border-radius: 12px;
+            line-height: 1.7;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .message {
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            line-height: 1.6;
-            max-width: 80%;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .user-message {
             background-color: var(--user-message);
             margin-left: auto;
-            border-bottom-right-radius: 2px;
+            border-bottom-right-radius: 5px;
+            border-top-left-radius: 12px;
         }
 
         .bot-message {
             background-color: var(--bot-message);
             margin-right: auto;
-            border-bottom-left-radius: 2px;
+            border-bottom-left-radius: 5px;
+            border-top-right-radius: 12px;
+        }
+
+        .message-content {
+            white-space: pre-wrap;
+            font-size: 1.05rem;
         }
 
         .message-time {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--secondary-text);
-            margin-top: 5px;
+            margin-top: 8px;
             text-align: right;
+            opacity: 0.8;
         }
 
         .input-area {
-            padding: 15px;
+            padding: 20px;
             border-top: 1px solid var(--border-color);
             background-color: var(--bg-darker);
         }
 
         .input-container {
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
             position: relative;
         }
 
-        .sidebar.collapsed ~ .main-content .input-container {
-            max-width: 1000px;
-        }
-
         .input-box {
             width: 100%;
-            padding: 15px 50px 15px 20px;
+            padding: 16px 60px 16px 22px;
             background-color: var(--input-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 15px;
             color: var(--primary-text);
-            font-size: 1rem;
+            font-size: 1.05rem;
             outline: none;
             resize: none;
-            min-height: 60px;
+            min-height: 65px;
             max-height: 200px;
+            transition: all 0.2s;
+            line-height: 1.6;
+        }
+
+        .input-box:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
         }
 
         .input-actions {
             position: absolute;
-            right: 15px;
-            bottom: 15px;
+            right: 20px;
+            bottom: 20px;
             display: flex;
             align-items: center;
+            gap: 10px;
         }
 
         .input-actions button {
@@ -374,38 +431,64 @@
             border: none;
             color: var(--secondary-text);
             cursor: pointer;
-            margin-left: 10px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        .input-actions button:hover {
+            color: var(--primary-blue);
+            background-color: rgba(26, 115, 232, 0.1);
+            transform: scale(1.1);
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
-                position: fixed;
-                z-index: 100;
-                height: 100%;
+                transform: translateX(-100%);
+                width: 85%;
             }
-
+            .sidebar:not(.collapsed) {
+                transform: translateX(0);
+                z-index: 1000;
+            }
             .main-content {
                 margin-left: 0;
                 width: 100%;
             }
-
-            .sidebar:not(.collapsed) {
-                z-index: 1000;
+            .top-bar {
+                padding: 12px 15px;
             }
-
             .chat-title {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
-
-            .app-title {
+            .welcome-message {
+                padding: 20px;
                 font-size: 1rem;
             }
-
-            .app-logo {
-                font-size: 1.2rem;
+            .message {
+                padding: 15px 18px;
+                max-width: 90%;
             }
+            .input-box {
+                padding: 14px 55px 14px 18px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
 </head>
@@ -420,15 +503,15 @@
         </div>
 
         <div class="search-bar">
-            <input type="text" placeholder="Sohbet ara...">
+            <input type="text" placeholder="Sohbet ara..." id="search-chats">
         </div>
 
         <div class="chat-history" id="chat-history">
-            <!-- Sohbet geçmişi buraya dinamik olarak eklenecek -->
+            <!-- Sohbet geçmişi dinamik olarak eklenecek -->
         </div>
     </div>
 
-    <!-- Ana İçerik -->
+    <!-- Ana Ä°Ã§erik -->
     <div class="main-content">
         <div class="top-bar">
             <div class="top-bar-left">
@@ -450,7 +533,7 @@
                 <div class="dropdown-content">
                     <a href="profile.html"><i class="fas fa-user"></i> Profil</a>
                     <a href="settings.html"><i class="fas fa-cog"></i> Ayarlar</a>
-                    <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Oturumu Kapat</a>
+                    <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
                 </div>
             </div>
         </div>
@@ -459,12 +542,13 @@
             <div class="welcome-container" id="welcome-container">
                 <h1 class="chat-title">Medeni Hukuk Asistanı</h1>
                 <div class="welcome-message">
-                    Merhaba, Medeni Hukuk ile ilgili sorunuzu bana sorabilirsiniz.
+                    Merhaba, Medeni Hukuk ile ilgili sorunuzu bana sorabilirsiniz. <br>
+                    Örneğinin: "Boşanma sürecinde mal paylaşımı nasıl olur?" veya "Velayet davası nasıl sağlanır?"
                 </div>
             </div>
 
             <div class="message-container" id="message-container">
-                <!-- Mesajlar buraya eklenecek -->
+                <!-- Mesajlar dinamik olarak eklenecek -->
             </div>
         </div>
 
@@ -472,10 +556,10 @@
             <div class="input-container">
                 <textarea class="input-box" id="user-input" placeholder="Mesaj yazın..." rows="1"></textarea>
                 <div class="input-actions">
-                    <button id="voice-btn">
+                    <button id="voice-btn" title="Sesli giriş">
                         <i class="fas fa-microphone"></i>
                     </button>
-                    <button id="send-btn">
+                    <button id="send-btn" title="Gönder">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
@@ -487,7 +571,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elementleri
             const sidebar = document.querySelector('.sidebar');
-            const toggleSidebarMain = document.getElementById('toggle-sidebar-main');
+            const toggleSidebarBtn = document.getElementById('toggle-sidebar-main');
             const newChatBtn = document.getElementById('new-chat-btn');
             const chatHistory = document.getElementById('chat-history');
             const welcomeContainer = document.getElementById('welcome-container');
@@ -496,50 +580,54 @@
             const userInput = document.getElementById('user-input');
             const sendBtn = document.getElementById('send-btn');
             const voiceBtn = document.getElementById('voice-btn');
+            const searchInput = document.getElementById('search-chats');
             const homeButton = document.getElementById('home-button');
 
-            // Ana sayfa butonu
-            homeButton.addEventListener('click', function() {
-                window.location.href = 'index.html';
-            });
-
-            // Sohbet geçmişi ve aktif sohbet
+            // Sohbet verileri
             let chats = [];
             let activeChatId = null;
 
-            // Panel aç/kapa
-            function toggleSidebarFunc() {
-                sidebar.classList.toggle('collapsed');
+            // Başlangıçtata yeni sohbet oluştur
+            function init() {
+                if (chats.length === 0) {
+                    createNewChat();
+                } else {
+                    switchToChat(chats[0].id);
+                }
             }
 
-            toggleSidebarMain.addEventListener('click', toggleSidebarFunc);
-
-            // Yeni sohbet oluştur
+            // Yeni sohbet oluÅŸtur
             function createNewChat() {
                 const chatId = Date.now().toString();
-                const chatTitle = "Yeni Sohbet " + (chats.length + 1);
                 const chat = {
                     id: chatId,
-                    title: chatTitle,
+                    title: 'Yeni Sohbet',
                     messages: [],
                     createdAt: new Date()
                 };
 
-                chats.unshift(chat); // En üste ekle
+                chats.unshift(chat);
                 activeChatId = chatId;
                 renderChatHistory();
                 switchToChat(chatId);
 
+                // ArayÃ¼z gÃ¼ncelleme
+                welcomeContainer.style.display = 'none';
                 messageContainer.style.display = 'block';
+                userInput.focus();
             }
 
-            newChatBtn.addEventListener('click', createNewChat);
-
-            // Sohbet geçmişini render et
+            // Sohbet geÃ§miÅŸini render et
             function renderChatHistory() {
                 chatHistory.innerHTML = '';
 
-                chats.forEach(chat => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredChats = chats.filter(chat =>
+                    chat.title.toLowerCase().includes(searchTerm) ||
+                    chat.messages.some(msg => msg.content.toLowerCase().includes(searchTerm))
+                );
+
+                filteredChats.forEach(chat => {
                     const chatItem = document.createElement('div');
                     chatItem.className = `chat-item ${activeChatId === chat.id ? 'active' : ''}`;
                     chatItem.innerHTML = `
@@ -552,11 +640,7 @@
                         </div>
                     `;
 
-                    chatItem.addEventListener('click', (e) => {
-                        if (!e.target.closest('.delete-chat')) {
-                            switchToChat(chat.id);
-                        }
-                    });
+                    chatItem.addEventListener('click', () => switchToChat(chat.id));
 
                     const deleteBtn = chatItem.querySelector('.delete-chat');
                     deleteBtn.addEventListener('click', (e) => {
@@ -568,9 +652,9 @@
                 });
             }
 
-            // Sohbet silme fonksiyonu
+            // Sohbet sil
             function deleteChat(chatId) {
-                if (confirm('Bu sohbeti silmek istediğinize emin misiniz?')) {
+                if (confirm('Bu sohbeti silmek istediÄŸinize emin misiniz?')) {
                     chats = chats.filter(chat => chat.id !== chatId);
 
                     if (activeChatId === chatId) {
@@ -586,12 +670,10 @@
                 }
             }
 
-            // Sohbeti değiştir
+            // Sohbeti aÃ§
             function switchToChat(chatId) {
                 activeChatId = chatId;
                 const chat = chats.find(c => c.id === chatId);
-
-                renderChatHistory();
 
                 messageContainer.innerHTML = '';
 
@@ -607,14 +689,13 @@
                     messageContainer.style.display = 'none';
                 }
 
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+                renderChatHistory();
+                scrollToBottom();
             }
 
             // Mesaj ekle
             function addMessage(content, isUser) {
-                if (!activeChatId) {
-                    createNewChat();
-                }
+                if (!activeChatId) createNewChat();
 
                 const chat = chats.find(c => c.id === activeChatId);
                 const message = {
@@ -624,13 +705,17 @@
                 };
 
                 chat.messages.push(message);
-                chat.title = content.length > 30 ? content.substring(0, 30) + '...' : content;
+
+                // Ä°lk mesajsa baÅŸlÄ±ÄŸÄ± gÃ¼ncelle
+                if (chat.messages.length === 1 && isUser) {
+                    chat.title = content.length > 30 ? content.substring(0, 30) + '...' : content;
+                }
 
                 addMessageToContainer(content, isUser, true);
                 renderChatHistory();
             }
 
-            // Mesajı arayüze ekle
+            // MesajÄ± arayÃ¼ze ekle
             function addMessageToContainer(content, isUser, scroll) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
@@ -644,51 +729,58 @@
 
                 messageContainer.appendChild(messageDiv);
 
-                if (scroll) {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                }
-            }
-
-            // Bot yanıtı simüle et
-            function simulateBotResponse(userMessage) {
-                const responses = [
-                    "Medeni Kanun'un 23. maddesine göre, bu durumda...",
-                    "Yargıtay'ın 2023/4567 sayılı kararında benzer bir durumda...",
-                    "Sorduğunuz konu Türk Medeni Kanunu'nun 145-156. maddeleri kapsamında düzenlenmiştir.",
-                    "Bu konuda Yargıtay'ın yerleşik bir içtihadı bulunmaktadır...",
-                    "Medeni hukukta bu durum '${userMessage.split(' ')[0]}' kavramıyla ilişkilendirilir..."
-                ];
-
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-
-                setTimeout(() => {
-                    addMessage(randomResponse, false);
-                }, 1000);
+                if (scroll) scrollToBottom();
             }
 
             // Mesaj gönder
-            function sendMessage() {
+            async function sendMessage() {
                 const message = userInput.value.trim();
-                if (message === '') return;
+                if (!message) return;
 
                 addMessage(message, true);
                 userInput.value = '';
+                userInput.style.height = 'auto';
 
-                simulateBotResponse(message);
+                try {
+                    const response = await fetch('http://localhost:8000/api/ask', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            question: message,
+                            chat_id: activeChatId
+                        })
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                    const data = await response.json();
+                    const botReply = data.answer || "Üzgünüm, bir yanıt oluşturamadım.";
+                    addMessage(botReply, false);
+                } catch (error) {
+                    console.error('API hatası:', error);
+                    addMessage('Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.', false);
+                }
             }
 
-            // Event listeners
-            userInput.addEventListener('keypress', function(e) {
+            // Yardımcı fonksiyonlar
+            function scrollToBottom() {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            // Event Listeners
+            toggleSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+
+            newChatBtn.addEventListener('click', createNewChat);
+
+            sendBtn.addEventListener('click', sendMessage);
+
+            userInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
                 }
-            });
-
-            sendBtn.addEventListener('click', sendMessage);
-
-            voiceBtn.addEventListener('click', function() {
-                alert('Sesli giriş özelliği aktif edilecek');
             });
 
             userInput.addEventListener('input', function() {
@@ -696,8 +788,22 @@
                 this.style.height = (this.scrollHeight) + 'px';
             });
 
-            // Başlangıçta welcome ekranını göster
-            welcomeContainer.style.display = 'flex';
+            searchInput.addEventListener('input', renderChatHistory);
+
+            homeButton.addEventListener('click', () => {
+                if (chats.length === 0) {
+                    createNewChat();
+                } else {
+                    switchToChat(chats[0].id);
+                }
+            });
+
+            voiceBtn.addEventListener('click', () => {
+                alert('Sesli giriş yakında eklenecek!');
+            });
+
+            // Uygulamayı başlat
+            init();
         });
     </script>
 </body>
