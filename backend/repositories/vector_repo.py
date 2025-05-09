@@ -1,8 +1,9 @@
-import pinecone
 from typing import List, Optional
 from fastapi import HTTPException
 import os
 from dotenv import load_dotenv
+from pinecone import Pinecone, ServerlessSpec
+from langchain_openai import OpenAIEmbeddings  # ✅ Embedding modeli eklendi
 
 load_dotenv()
 
@@ -10,26 +11,42 @@ load_dotenv()
 class VectorRepository:
     def __init__(self):
         pinecone_api_key = os.getenv("PINECONE_API_KEY")
-        pinecone_env = os.getenv("PINECONE_ENVIRONMENT")
+        pinecone_env = os.getenv("PINECONE_ENVIRONMENT")  # Örn: "us-west-2"
 
         if not pinecone_api_key or not pinecone_env:
             raise ValueError("Pinecone credentials not configured")
 
-        pinecone.init(api_key=pinecone_api_key, environment=pinecone_env)
         self.index_name = "medeni-hukuk"
 
-        if self.index_name not in pinecone.list_indexes():
+        # Pinecone istemcisi başlat
+        self.pc = Pinecone(api_key=pinecone_api_key)
+
+        # Index yoksa oluştur
+        if self.index_name not in self.pc.list_indexes().names():
             self._create_index()
 
-        self.index = pinecone.Index(self.index_name)
+        # Index'e erişim sağla
+        self.index = self.pc.Index(self.index_name)
+
+        # ✅ Embedding modelini başlat
+        self.embed_model = OpenAIEmbeddings()
 
     def _create_index(self, dimension=1536, metric="cosine"):
-        pinecone.create_index(
+        self.pc.create_index(
             name=self.index_name,
             dimension=dimension,
             metric=metric,
-            pod_type="p1"
+            spec=ServerlessSpec(
+                cloud="aws",
+                region=os.getenv("PINECONE_ENVIRONMENT")
+            )
         )
+
+    def _get_embedding(self, text: str) -> List[float]:
+        """
+        ✅ Belirli bir metni OpenAI kullanarak embed eder.
+        """
+        return self.embed_model.embed_query(text)
 
     async def upsert_vectors(self, vectors: List[dict]):
         try:

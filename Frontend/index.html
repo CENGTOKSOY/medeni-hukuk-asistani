@@ -213,7 +213,7 @@
             display: block;
         }
 
-        /* Ana Ä°Ã§erik */
+        /* Ana İçerik */
         .main-content {
             flex: 1;
             display: flex;
@@ -384,6 +384,52 @@
             opacity: 0.8;
         }
 
+        /* Typing Indicator */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: var(--bot-message);
+            border-radius: 18px;
+            margin-right: auto;
+            margin-bottom: 22px;
+            max-width: 85%;
+            border-bottom-left-radius: 5px;
+            border-top-right-radius: 12px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary-text);
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.6;
+            }
+            30% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+        }
+
         .input-area {
             padding: 20px;
             border-top: 1px solid var(--border-color);
@@ -471,6 +517,9 @@
                 padding: 15px 18px;
                 max-width: 90%;
             }
+            .typing-indicator {
+                padding: 8px 12px;
+            }
             .input-box {
                 padding: 14px 55px 14px 18px;
             }
@@ -511,7 +560,7 @@
         </div>
     </div>
 
-    <!-- Ana Ä°Ã§erik -->
+    <!-- Ana İçerik -->
     <div class="main-content">
         <div class="top-bar">
             <div class="top-bar-left">
@@ -586,17 +635,20 @@
             // Sohbet verileri
             let chats = [];
             let activeChatId = null;
+            let typingIndicator = null;
 
-            // Başlangıçtata yeni sohbet oluştur
+            // Başlangıçta yeni sohbet oluştur
             function init() {
                 if (chats.length === 0) {
-                    createNewChat();
+                    // Karşılama mesajını göster, yeni sohbet oluşturma
+                    welcomeContainer.style.display = 'flex';
+                    messageContainer.style.display = 'none';
                 } else {
                     switchToChat(chats[0].id);
                 }
             }
 
-            // Yeni sohbet oluÅŸtur
+            // Yeni sohbet oluştur
             function createNewChat() {
                 const chatId = Date.now().toString();
                 const chat = {
@@ -611,13 +663,13 @@
                 renderChatHistory();
                 switchToChat(chatId);
 
-                // ArayÃ¼z gÃ¼ncelleme
+                // Arayüz güncelleme
                 welcomeContainer.style.display = 'none';
                 messageContainer.style.display = 'block';
                 userInput.focus();
             }
 
-            // Sohbet geÃ§miÅŸini render et
+            // Sohbet geçmişini render et
             function renderChatHistory() {
                 chatHistory.innerHTML = '';
 
@@ -654,7 +706,7 @@
 
             // Sohbet sil
             function deleteChat(chatId) {
-                if (confirm('Bu sohbeti silmek istediÄŸinize emin misiniz?')) {
+                if (confirm('Bu sohbeti silmek istediğinize emin misiniz?')) {
                     chats = chats.filter(chat => chat.id !== chatId);
 
                     if (activeChatId === chatId) {
@@ -662,7 +714,10 @@
                             activeChatId = chats[0].id;
                             switchToChat(activeChatId);
                         } else {
-                            createNewChat();
+                            // Tüm sohbetler silindiğinde karşılama mesajını göster
+                            welcomeContainer.style.display = 'flex';
+                            messageContainer.style.display = 'none';
+                            activeChatId = null;
                         }
                     }
 
@@ -670,7 +725,7 @@
                 }
             }
 
-            // Sohbeti aÃ§
+            // Sohbeti aç
             function switchToChat(chatId) {
                 activeChatId = chatId;
                 const chat = chats.find(c => c.id === chatId);
@@ -685,8 +740,8 @@
                         addMessageToContainer(msg.content, msg.isUser, false);
                     });
                 } else {
-                    welcomeContainer.style.display = 'flex';
-                    messageContainer.style.display = 'none';
+                    welcomeContainer.style.display = 'none';
+                    messageContainer.style.display = 'block';
                 }
 
                 renderChatHistory();
@@ -706,7 +761,7 @@
 
                 chat.messages.push(message);
 
-                // Ä°lk mesajsa baÅŸlÄ±ÄŸÄ± gÃ¼ncelle
+                // İlk mesajsa başlığı güncelle
                 if (chat.messages.length === 1 && isUser) {
                     chat.title = content.length > 30 ? content.substring(0, 30) + '...' : content;
                 }
@@ -715,7 +770,7 @@
                 renderChatHistory();
             }
 
-            // MesajÄ± arayÃ¼ze ekle
+            // Mesajı arayüze ekle
             function addMessageToContainer(content, isUser, scroll) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
@@ -732,14 +787,46 @@
                 if (scroll) scrollToBottom();
             }
 
+            // Typing indicator göster
+            function showTypingIndicator() {
+                if (typingIndicator) return; // Zaten gösteriliyorsa tekrar oluşturma
+
+                typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                typingIndicator.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
+
+                messageContainer.appendChild(typingIndicator);
+                scrollToBottom();
+            }
+
+            // Typing indicator gizle
+            function hideTypingIndicator() {
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                    typingIndicator = null;
+                }
+            }
+
             // Mesaj gönder
             async function sendMessage() {
                 const message = userInput.value.trim();
                 if (!message) return;
 
+                // Eğer aktif sohbet yoksa veya karşılama ekranı gösteriliyorsa yeni sohbet oluştur
+                if (!activeChatId || welcomeContainer.style.display === 'flex') {
+                    createNewChat();
+                }
+
                 addMessage(message, true);
                 userInput.value = '';
                 userInput.style.height = 'auto';
+
+                // Typing indicator göster
+                showTypingIndicator();
 
                 try {
                     const response = await fetch('http://localhost:8000/api/ask', {
@@ -755,9 +842,13 @@
 
                     const data = await response.json();
                     const botReply = data.answer || "Üzgünüm, bir yanıt oluşturamadım.";
+
+                    // Typing indicator gizle ve yanıtı göster
+                    hideTypingIndicator();
                     addMessage(botReply, false);
                 } catch (error) {
                     console.error('API hatası:', error);
+                    hideTypingIndicator();
                     addMessage('Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.', false);
                 }
             }
@@ -792,7 +883,10 @@
 
             homeButton.addEventListener('click', () => {
                 if (chats.length === 0) {
-                    createNewChat();
+                    // Karşılama mesajını göster
+                    welcomeContainer.style.display = 'flex';
+                    messageContainer.style.display = 'none';
+                    activeChatId = null;
                 } else {
                     switchToChat(chats[0].id);
                 }
